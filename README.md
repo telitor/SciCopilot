@@ -1,556 +1,389 @@
-<div align="center">
+# SciPilot
 
-<br/>
+<p align="center">
+  <strong>面向软件工程科研场景的 AI 智能体平台</strong>
+</p>
 
-# ✨ SciPilot
+<p align="center">
+  <em>AI-powered Research Agent Platform for Software Engineering</em>
+</p>
 
-### 🧠 面向软件工程学科的智能体学习与项目辅助平台
-
-<br/>
-
-**Paper Reading · Code Understanding · Project Planning · AI Agents**
-
-<br/>
-
-![SciPilot](https://img.shields.io/badge/SciCopilot-v0.1%20MVP-6C63FF?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Initial%20Development-FFB000?style=for-the-badge)
-![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-Frontend-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-
-<br/>
-
-> **SciCopilot** is a vertical AI platform for Software Engineering.  
-> The first version focuses on a clean MVP: **login, agents, chat, data persistence, and conversation history**.
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6C63FF,50:00C2FF,100:3ECF8E&height=120&section=header&text=SciCopilot&fontSize=38&fontColor=ffffff&animation=fadeIn" />
-
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-MVP-blueviolet" />
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-61DAFB" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688" />
+  <img src="https://img.shields.io/badge/Database-Supabase-3ECF8E" />
+  <img src="https://img.shields.io/badge/Agent-Paper%20Reading-orange" />
+</p>
 
 ---
 
-## 🌌 Project Overview
+## 项目简介
 
-**SciPilot** 是一个面向软件工程学科的智能体平台，目标是为论文阅读、代码理解、项目规划等学习与开发场景提供专业 AI 支持。
+**SciPilot** 是一个面向软件工程科研与学习场景的 AI 智能体平台，旨在通过大模型、知识组织、论文解析与对话式交互，辅助用户完成论文精读、科研理解、问题分析与项目规划等任务。
 
-它不是一个简单的通用聊天机器人，而是一个逐步扩展的垂直领域平台：
+当前版本以 **论文精读助手** 作为首个核心 Agent，已初步打通从用户登录、论文上传、结构化分析、智能追问到消息保存的 MVP 闭环。
+
+> SciPilot 的目标不是构建一个普通聊天工具，而是打造一个面向软件工程垂直领域的科研智能副驾驶。
+
+---
+
+## 核心能力
+
+- **用户认证**：基于 Supabase Auth 实现登录与鉴权。
+- **论文上传**：支持 PDF 文件上传与后端解析。
+- **论文精读**：调用论文精读 Agent 生成结构化分析结果。
+- **智能追问**：用户可围绕当前论文继续提问。
+- **对话保存**：用户消息与 Agent 回复写入 Supabase。
+- **前后端分离**：React 前端 + FastAPI 后端。
+- **安全代理**：Agent API Key 仅保存在后端，前端不暴露敏感密钥。
+
+---
+
+## 当前闭环
 
 ```text
-学科场景
+用户登录
   ↓
-专业智能体
+上传 PDF 论文
   ↓
-对话交互
+后端解析论文文本
   ↓
-历史记录
+调用论文精读 Agent
   ↓
-数据沉淀
+生成结构化精读报告
   ↓
-后续扩展为知识库与多智能体协作
+前端展示论文分析结果
+  ↓
+用户继续追问论文内容
+  ↓
+后端调用 Agent 返回回答
+  ↓
+Supabase 保存对话记录
 ```
 
-当前版本：
+---
+
+## 系统架构
 
 ```text
-SciPilot v0.1 MVP
+┌──────────────────────────────┐
+│            Frontend          │
+│   React + TypeScript + Vite  │
+│                              │
+│   登录 / 论文精读 / 聊天界面   │
+└───────────────┬──────────────┘
+                │ REST API
+                ▼
+┌──────────────────────────────┐
+│             Backend          │
+│            FastAPI           │
+│                              │
+│   Auth / Chat / Paper Analyze│
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│            Supabase          │
+│                              │
+│   Auth / PostgreSQL / RLS    │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│       Paper Reading Agent    │
+│                              │
+│   论文解析 / 精读 / 智能问答   │
+└──────────────────────────────┘
 ```
-
-第一版先不追求复杂功能堆叠，而是先完成一个稳定、清晰、可继续扩展的基础闭环。
 
 ---
 
-## 🧭 MVP Target
+## 技术栈
 
-### 🎯 Version Goal
+| 模块 | 技术 |
+|---|---|
+| 前端 | React, TypeScript, Vite, Tailwind CSS, Zustand, Axios |
+| 后端 | FastAPI, Python, Uvicorn, Pydantic |
+| 数据库 | Supabase PostgreSQL |
+| 认证 | Supabase Auth |
+| 权限 | Row Level Security |
+| Agent | 后端统一代理论文精读 Agent |
+| 文件解析 | PDF Text Extraction |
 
-第一版目标是跑通最核心的产品流程：
+---
+
+## 功能模块
+
+### 1. 用户认证
+
+- 用户登录
+- Token 持久化
+- 后端接口鉴权
+- 当前用户信息读取
+
+### 2. 论文精读
+
+- PDF 上传
+- 文本解析
+- 结构化报告生成
+- 研究背景、核心方法、实验结果、关键结论展示
+
+### 3. 论文追问
+
+- 基于当前论文上下文提问
+- Agent 返回针对性回答
+- 前端实时展示对话
+- 后端保存消息记录
+
+### 4. 对话管理
+
+- 创建会话
+- 查询会话
+- 保存 user / assistant 消息
+- 按 conversation_id 读取历史消息
+
+---
+
+## 后端接口
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/` | Health Check |
+| POST | `/auth/login` | 用户登录 |
+| POST | `/auth/register` | 用户注册 |
+| GET | `/users/me` | 当前用户信息 |
+| GET | `/agents` | 获取 Agent 列表 |
+| POST | `/conversations` | 创建对话 |
+| GET | `/conversations` | 查询对话 |
+| GET | `/conversations/{conversation_id}/messages` | 查询消息 |
+| POST | `/chat` | Agent 对话 |
+| POST | `/papers/analyze` | 论文解析与精读 |
+
+---
+
+## 数据库设计
 
 ```text
-用户注册 / 登录
-      ↓
-查看智能体列表
-      ↓
-选择一个智能体
-      ↓
-进入聊天页面
-      ↓
-发送问题
-      ↓
-获得 AI 回复
-      ↓
-保存聊天记录
-      ↓
-再次登录后查看历史对话
+profiles
+├── id
+├── email
+├── username
+├── avatar_url
+├── created_at
+└── updated_at
+
+agents
+├── id
+├── name
+├── description
+├── category
+├── system_prompt
+├── is_public
+├── created_at
+└── updated_at
+
+conversations
+├── id
+├── user_id
+├── agent_id
+├── title
+├── created_at
+└── updated_at
+
+messages
+├── id
+├── conversation_id
+├── user_id
+├── role
+├── content
+└── created_at
 ```
 
-### ✅ MVP Success Criteria
-
-| No. | Capability | Description |
-| --- | --- | --- |
-| 01 | 用户认证 | 支持注册、登录、退出 |
-| 02 | 智能体列表 | 展示第一版预设智能体 |
-| 03 | 对话创建 | 用户可以选择智能体开启新对话 |
-| 04 | AI 回复 | 后端调用大模型生成回答 |
-| 05 | 消息保存 | 用户消息和 AI 回复写入数据库 |
-| 06 | 历史记录 | 用户可以查看历史对话 |
-| 07 | 权限隔离 | 用户只能访问自己的数据 |
-
 ---
 
-## 🧩 Core Agents
-
-第一版暂定 3 个基础智能体。
-
-<table>
-  <tr>
-    <td align="center" width="33%">
-      <h3>📚 论文精读助手</h3>
-      <p>帮助用户阅读、拆解和理解软件工程及 AI 相关论文。</p>
-      <p><b>Paper Reading Agent</b></p>
-    </td>
-    <td align="center" width="33%">
-      <h3>💻 代码解释助手</h3>
-      <p>帮助用户理解代码逻辑、定位报错、给出修改建议。</p>
-      <p><b>Code Explanation Agent</b></p>
-    </td>
-    <td align="center" width="33%">
-      <h3>🗺️ 项目规划助手</h3>
-      <p>帮助用户拆解项目功能、设计模块、规划开发路线。</p>
-      <p><b>Project Planning Agent</b></p>
-    </td>
-  </tr>
-</table>
-
----
-
-## 📚 Agent 01 · 论文精读助手
-
-### Positioning
-
-论文精读助手面向软件工程、人工智能、智能软件开发等方向的论文阅读场景。
-
-它的目标不是简单总结文章，而是帮助用户完成：
-
-- 论文结构拆解
-- 研究问题提炼
-- 方法流程梳理
-- 实验设计理解
-- 创新点分析
-- 局限性总结
-- 可复现思路整理
-- 与项目选题结合
-
-### Example Tasks
+## 项目结构
 
 ```text
-请帮我精读这篇论文的 Abstract 和 Introduction。
-请总结这篇论文解决了什么问题。
-请解释论文中的方法流程。
-请帮我提炼创新点和不足。
-请把这篇论文整理成组会汇报结构。
-```
-
-### Initial System Prompt
-
-```text
-你是一名论文精读助手，擅长帮助学生阅读和理解软件工程、人工智能、智能软件开发方向的学术论文。你的回答应当结构清晰，重点突出，能够从研究背景、核心问题、方法思路、实验设计、创新点、不足和可复现方向等角度进行分析。面对基础较弱的用户时，要避免空泛总结，优先使用分点解释和通俗说明。
-```
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-flowchart TD
-    A[User] --> B[Frontend<br/>React / Next.js]
-    B --> C[Supabase Auth<br/>Login / Register]
-    B --> D[FastAPI Backend<br/>Chat API]
-    D --> E[LLM API<br/>AI Response]
-    D --> F[Supabase PostgreSQL<br/>Conversations / Messages]
-    F --> B
-```
-
-| Layer | Responsibility |
-| --- | --- |
-| Frontend | 页面展示、登录入口、智能体选择、聊天交互 |
-| Supabase Auth | 用户注册、登录、身份识别 |
-| FastAPI Backend | 聊天接口、大模型调用、业务逻辑 |
-| Supabase PostgreSQL | 保存智能体、对话、消息等数据 |
-| LLM API | 根据智能体 prompt 生成回复 |
-
----
-
-## 🛠️ Tech Stack
-
-| Area | Technology |
-| --- | --- |
-| Frontend | React / Next.js / TypeScript / Tailwind CSS |
-| Backend | Python / FastAPI / Uvicorn |
-| Database | Supabase PostgreSQL |
-| Auth | Supabase Auth |
-| Security | Row Level Security |
-| AI | LLM API |
-| Dev Tools | Git / GitHub / VS Code / Apifox or Postman |
-
----
-
-## 🗃️ Database Design
-
-第一版只保留最小必要数据表。
-
-```mermaid
-erDiagram
-    AUTH_USERS ||--|| PROFILES : has
-    AUTH_USERS ||--o{ CONVERSATIONS : creates
-    AGENTS ||--o{ CONVERSATIONS : used_by
-    CONVERSATIONS ||--o{ MESSAGES : contains
-
-    AUTH_USERS {
-      uuid id
-      text email
-    }
-
-    PROFILES {
-      uuid id
-      text username
-      text avatar_url
-      text role
-      timestamptz created_at
-    }
-
-    AGENTS {
-      uuid id
-      text name
-      text description
-      text system_prompt
-      text category
-      boolean is_public
-      timestamptz created_at
-    }
-
-    CONVERSATIONS {
-      uuid id
-      uuid user_id
-      uuid agent_id
-      text title
-      timestamptz created_at
-      timestamptz updated_at
-    }
-
-    MESSAGES {
-      uuid id
-      uuid conversation_id
-      uuid user_id
-      text role
-      text content
-      timestamptz created_at
-    }
-```
-
-| Table | Description |
-| --- | --- |
-| `profiles` | 用户资料表 |
-| `agents` | 智能体配置表 |
-| `conversations` | 对话会话表 |
-| `messages` | 聊天消息表 |
-
----
-
-## 🧠 Initial Agents Data
-
-| Agent | Category | Main Use |
-| --- | --- | --- |
-| 论文精读助手 | `paper-reading` | 论文阅读、结构拆解、创新点分析 |
-| 代码解释助手 | `coding` | 代码理解、报错分析、修改建议 |
-| 项目规划助手 | `project-planning` | 项目拆解、技术路线、接口设计 |
-
----
-
-## 🔌 API Design
-
-### Health Check
-
-```http
-GET /
-```
-
-```json
-{
-  "status": "ok",
-  "service": "SciPilot Backend"
-}
-```
-
----
-
-### Get Agents
-
-```http
-GET /agents
-```
-
-```json
-[
-  {
-    "id": "agent_id",
-    "name": "论文精读助手",
-    "description": "帮助用户精读软件工程与人工智能方向论文",
-    "category": "paper-reading"
-  }
-]
-```
-
----
-
-### Create Conversation
-
-```http
-POST /conversations
-```
-
-```json
-{
-  "agent_id": "agent_id",
-  "title": "论文精读对话"
-}
-```
-
----
-
-### Chat
-
-```http
-POST /chat
-```
-
-```json
-{
-  "conversation_id": "conversation_id",
-  "agent_id": "agent_id",
-  "message": "请帮我分析这篇论文的研究问题和创新点"
-}
-```
-
-### Chat Backend Workflow
-
-```text
-1. 校验当前用户身份
-2. 校验 conversation 是否属于当前用户
-3. 查询 agent 的 system_prompt
-4. 保存用户消息
-5. 调用大模型
-6. 保存 AI 回复
-7. 返回结果给前端
-```
-
----
-
-## 📁 Project Structure
-
-```text
-SciPilot/
+SciPilot
+├── Agent
+│   └── PaperReading.md
 │
-├── backend/
+├── backend
 │   ├── main.py
 │   ├── requirements.txt
 │   ├── .env.example
-│   └── services/
+│   └── services
+│       ├── supabase_service.py
 │       ├── llm_service.py
-│       └── supabase_service.py
+│       └── xunfei_agent_service.py
 │
-├── frontend/
-│   ├── app/
-│   ├── components/
-│   ├── lib/
-│   └── package.json
+├── frontend
+│   ├── public
+│   ├── src
+│   │   ├── components
+│   │   ├── pages
+│   │   ├── services
+│   │   ├── store
+│   │   └── main.tsx
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── .env.example
 │
-├── docs/
-│   ├── api.md
-│   └── database.md
+├── supabase
+│   └── migrations
+│       ├── 001_init_schema.sql
+│       ├── 002_updated_at_trigger.sql
+│       └── 003_rls_policies.sql
 │
-├── supabase/
-│   └── migrations/
-│
-├── README.md
-└── .gitignore
+├── docs
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 本地运行
 
-### Backend `.env`
-
-```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-
-LLM_API_KEY=your_llm_api_key
-LLM_BASE_URL=your_llm_base_url
-LLM_MODEL=your_model_name
-```
-
-### Security Rule
-
-```text
-.env 只保存在本地
-.env.example 可以提交到 GitHub
-service_role key 只能放后端
-大模型 API key 只能放后端
-```
-
----
-
-## 🚀 Local Development
-
-### Clone Repository
+### 1. 克隆项目
 
 ```bash
 git clone https://github.com/telitor/SciPilot.git
-cd SciCopilot
+cd SciPilot
 ```
 
-### Backend
+### 2. 启动后端
 
 ```bash
 cd backend
 python -m venv .venv
-```
-
-Windows:
-
-```bash
 .venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
 pip install -r requirements.txt
+copy .env.example .env
+python -m uvicorn main:app --reload
 ```
 
-Run backend:
+后端地址：
 
-```bash
-uvicorn main:app --reload
+```text
+http://localhost:8000
 ```
 
-### Frontend
+接口文档：
+
+```text
+http://localhost:8000/docs
+```
+
+### 3. 启动前端
 
 ```bash
 cd frontend
 npm install
+copy .env.example .env
 npm run dev
 ```
 
----
-
-## 🧱 Current MVP Roadmap
-
-### Phase 1 · Project Foundation
-
-- [x] Create GitHub repository
-- [x] Add README
-- [x] Create basic project structure
-- [x] Configure `.gitignore`
-- [x] Add `.env.example`
-- [x] Prepare local `.env`
-
-### Phase 2 · Supabase Base
-
-- [ ] Create `profiles` table
-- [ ] Create `agents` table
-- [ ] Create `conversations` table
-- [ ] Create `messages` table
-- [ ] Insert initial agents
-- [ ] Configure RLS policies
-
-### Phase 3 · Backend MVP
-
-- [ ] Create FastAPI backend
-- [ ] Add health check API
-- [ ] Add agent list API
-- [ ] Add conversation APIs
-- [ ] Add chat API
-- [ ] Connect LLM API
-- [ ] Save user and assistant messages
-
-### Phase 4 · Frontend MVP
-
-- [ ] Build login page
-- [ ] Build dashboard page
-- [ ] Build agent cards
-- [ ] Build chat page
-- [ ] Build conversation sidebar
-- [ ] Connect frontend with backend
-
----
-
-## 🧪 MVP Acceptance Checklist
-
-第一版完成时，应当满足：
+前端地址：
 
 ```text
-用户可以注册登录
-用户可以看到 3 个智能体
-用户可以选择论文精读助手开始对话
-用户可以发送消息并收到 AI 回复
-用户消息和 AI 回复会保存到数据库
-用户可以查看历史对话
-不同用户不能看到彼此数据
+http://localhost:5173
 ```
 
 ---
 
-## 🧬 Future Expansion
+## 环境变量
 
-| Version | Direction |
-| --- | --- |
-| v0.2 | 论文 PDF 上传与精读 |
-| v0.3 | 课程资料知识库问答 |
-| v0.4 | GitHub 仓库代码分析 |
-| v0.5 | 多智能体协作工作流 |
-| v0.6 | 项目空间与团队协作 |
+### Backend `.env`
 
----
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-## 🪄 Product Principles
+XF_AGENT_APP_ID=your_app_id
+XF_AGENT_API_KEY=your_api_key
+XF_AGENT_API_SECRET=your_api_secret
+XF_AGENT_ASSISTANT_ID=your_assistant_id
+```
 
-### 1. Small but Complete
+### Frontend `.env`
 
-第一版功能不多，但要形成完整闭环。
-
-### 2. Data First
-
-先把用户、智能体、对话、消息的数据结构打稳。
-
-### 3. Agent-Oriented
-
-每个智能体要有明确场景，避免泛泛而谈。
-
-### 4. Security by Default
-
-用户私有数据必须默认隔离。
-
-### 5. Build for Iteration
-
-先跑通基础版，再持续扩展论文、知识库、代码仓库和多智能体能力。
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
 ---
 
-<div align="center">
+## 当前进度
 
-<br/>
+| 功能 | 状态 |
+|---|---|
+| 项目结构搭建 | 已完成 |
+| Supabase 数据库设计 | 已完成 |
+| RLS 权限策略 | 已完成 |
+| FastAPI 基础接口 | 已完成 |
+| 用户登录鉴权 | 已完成 |
+| Agent 列表接口 | 已完成 |
+| 会话与消息接口 | 已完成 |
+| 论文精读 Agent 接入 | 已完成 |
+| PDF 上传与解析 | 已初步完成 |
+| 论文结构化展示 | 已初步完成 |
+| 右侧论文追问 | 已初步完成 |
+| 重新上传论文 | 已初步完成 |
+| 前后端小闭环 | 已跑通 |
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:3ECF8E,50:00C2FF,100:6C63FF&height=120&section=footer" />
+---
 
-### 🌟 SciCopilot v0.1
+## 后续规划
 
-**Read deeply. Code clearly. Build systematically.**
+- 优化 PDF 解析稳定性
+- 提升 Agent JSON 输出稳定性
+- 增加论文历史记录
+- 增加论文长期上下文保存
+- 支持更多科研 Agent
+- 引入代码解释与实验复现能力
+- 优化前端交互体验
+- 完善部署与软著材料
 
-<br/>
+---
 
-</div>
+## 安全原则
+
+本项目遵循前后端密钥隔离原则：
+
+- 前端只使用 Supabase anon key
+- 后端保存 service role key 与 Agent secret
+- `.env` 文件不提交 GitHub
+- Agent 调用统一由 FastAPI 后端代理
+- 前端不直接访问任何大模型密钥
+
+---
+
+## 项目特色
+
+- 面向软件工程科研场景
+- 首个 Agent 聚焦论文精读
+- 前后端分离架构清晰
+- Supabase 提供认证与数据库能力
+- FastAPI 统一管理业务接口
+- 具备多 Agent 扩展潜力
+- 已完成 MVP 小闭环验证
+
+---
+
+## 开发状态
+
+```text
+当前阶段：MVP 小闭环验证
+当前核心 Agent：论文精读助手
+当前状态：本地联调通过，持续迭代中
+```
+
+---
+
+<p align="center">
+  <strong>SciPilot · 让 AI 成为科研学习过程中的智能副驾驶</strong>
+</p>
