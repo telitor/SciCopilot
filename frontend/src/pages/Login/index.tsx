@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, FlaskConical, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
+import { authAPI } from '@/services/api';
 
 function Login() {
   const navigate = useNavigate();
@@ -23,20 +24,14 @@ function Login() {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await authAPI.login(email, password);
-      // const { user, token } = response.data;
+      const response = await authAPI.login(email, password);
+      const { user, token } = response.data;
 
-      // Mock login for frontend development
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const mockUser = {
-        id: '1',
-        email,
-        username: email.split('@')[0],
-        role: 'user' as const,
-        created_at: new Date().toISOString(),
-      };
-      login(mockUser, 'mock-jwt-token');
+      if (!token) {
+        throw new Error('Login response missing token');
+      }
+
+      login(user, token);
       addNotification({ type: 'success', message: '登录成功', duration: 3000 });
       navigate('/dashboard');
     } catch {

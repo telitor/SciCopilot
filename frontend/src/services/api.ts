@@ -4,12 +4,48 @@ import { useUIStore } from '@/store/uiStore';
 
 // ==================== Axios Instance ====================
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
+
+export function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      return '论文解析超时，请尝试上传更短的 PDF，或稍后重试。';
+    }
+
+    const detail = error.response?.data?.detail;
+
+    if (typeof detail === 'string') return detail;
+
+    if (Array.isArray(detail)) {
+      return detail
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          if (item && typeof item === 'object' && 'msg' in item) {
+            return String((item as { msg: unknown }).msg);
+          }
+          return JSON.stringify(item);
+        })
+        .join('; ');
+    }
+
+    if (detail && typeof detail === 'object') {
+      return JSON.stringify(detail);
+    }
+
+    const message = error.response?.data?.message;
+    if (message) {
+      return typeof message === 'string' ? message : JSON.stringify(message);
+    }
+
+    return error.message;
+  }
+
+  if (error instanceof Error) return error.message;
+
+  return '未知错误';
+}
 
 // Request interceptor - attach JWT token
 apiClient.interceptors.request.use(
@@ -31,10 +67,9 @@ apiClient.interceptors.response.use(
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }
-    const message = (error.response?.data as { detail?: string })?.detail || error.message;
     useUIStore.getState().addNotification({
       type: 'error',
-      message,
+      message: getErrorMessage(error),
       duration: 5000,
     });
     return Promise.reject(error);
@@ -48,17 +83,30 @@ export const authAPI = {
   login: (email: string, password: string) =>
     apiClient.post('/auth/login', { email, password }),
 
-  register: (email: string, password: string, username: string) =>
+  register: (email: string, password: string, username?: string) =>
     apiClient.post('/auth/register', { email, password, username }),
 
-  getMe: () => apiClient.get('/users/me'),
+  getCurrentUser: () => apiClient.get('/users/me'),
 
   // TODO: Connect to backend
   logout: () => Promise.resolve(),
 };
 
+// ---- Agents ----
+export const agentAPI = {
+  getAgents: () => apiClient.get('/agents'),
+};
+
 // ---- Papers ----
 export const paperAPI = {
+  analyzePaper: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post('/papers/analyze', formData, {
+      timeout: 180000,
+    });
+  },
+
   upload: (file: File, onProgress?: (progress: number) => void) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -139,18 +187,16 @@ export const kgAPI = {
 
 // ---- Conversations ----
 export const conversationAPI = {
-  getConversations: (params?: { module?: string; page?: number; limit?: number }) =>
-    apiClient.get('/conversations', { params }),
+  getConversations: () => apiClient.get('/conversations'),
 
-  getConversation: (id: string) => apiClient.get(`/conversations/${id}`),
-
-  createConversation: (data: { title: string; module: string; agent_id?: string }) =>
+  createConversation: (data: { agent_id: string; title?: string }) =>
     apiClient.post('/conversations', data),
 
-  deleteConversation: (id: string) => apiClient.delete(`/conversations/${id}`),
+  getMessages: (conversationId: string) =>
+    apiClient.get(`/conversations/${conversationId}/messages`),
 
-  sendMessage: (conversationId: string, content: string) =>
-    apiClient.post(`/conversations/${conversationId}/messages`, { content }),
+  chat: (data: { conversation_id: string; agent_id: string; message: string }) =>
+    apiClient.post('/chat', data),
 };
 
 // ==================== Mock Data Helpers ====================

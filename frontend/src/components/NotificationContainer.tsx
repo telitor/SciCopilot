@@ -40,6 +40,10 @@ function NotificationItem({
   onClose: () => void;
 }) {
   const Icon = iconMap[notification.type];
+  const message =
+    typeof notification.message === 'string'
+      ? notification.message
+      : JSON.stringify(notification.message);
 
   useEffect(() => {
     if (notification.duration) {
@@ -53,7 +57,7 @@ function NotificationItem({
       className={`flex items-start gap-3 p-4 rounded-xl border backdrop-blur-md shadow-lg animate-slide-up ${colorMap[notification.type]}`}
     >
       <Icon size={18} className="mt-0.5 flex-shrink-0" />
-      <p className="text-sm flex-1">{notification.message}</p>
+      <p className="text-sm flex-1">{message}</p>
       <button
         onClick={onClose}
         className="text-current opacity-60 hover:opacity-100 transition-opacity"

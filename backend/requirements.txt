@@ -5,3 +5,5 @@ supabase
 openai
 pydantic
 websocket-client
+pypdf
+python-multipart

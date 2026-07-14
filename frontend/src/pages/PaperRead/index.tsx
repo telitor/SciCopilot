@@ -1,17 +1,98 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+﻿import { useState, useRef, useCallback, useEffect } from 'react';
 import { Upload, Send, FileText, BookOpen, Quote, Loader2, X } from 'lucide-react';
 import { usePaperStore } from '@/store/paperStore';
 import { useUIStore } from '@/store/uiStore';
+import { agentAPI, conversationAPI, getErrorMessage, paperAPI } from '@/services/api';
 import type { Citation } from '@/types';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  isStreaming?: boolean;
 }
 
-// Simple Markdown renderer component
+interface Agent {
+  id: string;
+  name: string;
+  category?: string;
+}
+
+interface PaperAnalysisSection {
+  title?: string;
+  heading?: string;
+  content: string;
+  citation?: string;
+}
+
+interface PaperAnalysisResponse {
+  title: string;
+  authors: string | string[];
+  sections: PaperAnalysisSection[];
+  raw_analysis?: string;
+}
+
+function parseJsonLikeText(text?: string): PaperAnalysisResponse | null {
+  if (!text || (!text.includes('{') && !text.includes('sections'))) return null;
+
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.slice('```json'.length).trim();
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.slice('```'.length).trim();
+  }
+
+  if (cleaned.endsWith('```')) {
+    cleaned = cleaned.slice(0, -3).trim();
+  }
+
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  const jsonText = start !== -1 && end !== -1 && end > start
+    ? cleaned.slice(start, end + 1)
+    : cleaned;
+
+  try {
+    const parsed = JSON.parse(jsonText);
+    if (parsed && typeof parsed === 'object') {
+      return parsed as PaperAnalysisResponse;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function normalizeAnalysisSections(analysis: PaperAnalysisResponse) {
+  const parsedRaw = parseJsonLikeText(analysis.raw_analysis);
+  const rawSections = Array.isArray(analysis.sections) ? analysis.sections : [];
+  const parsedFromContent = rawSections.length === 1
+    ? parseJsonLikeText(rawSections[0]?.content)
+    : null;
+  const source = parsedRaw || parsedFromContent || analysis;
+  const sourceSections = Array.isArray(source.sections) ? source.sections : [];
+
+  if (sourceSections.length === 0) {
+    return [
+      {
+        heading: '论文精读结果',
+        content: analysis.raw_analysis || '论文解析完成，但没有返回结构化章节。',
+        citations: [{ source: '[1]', text: analysis.raw_analysis || '' }],
+      },
+    ];
+  }
+
+  return sourceSections
+    .filter((section) => section && typeof section === 'object')
+    .map((section, index) => ({
+      heading: String(section.title || section.heading || `章节 ${index + 1}`),
+      content: String(section.content || ''),
+      citations: section.citation
+        ? [{ source: String(section.citation), text: String(section.content || '') }]
+        : [],
+    }));
+}
+
 function MarkdownContent({ content }: { content: string }) {
   return (
     <div className="sci-markdown">
@@ -44,7 +125,14 @@ function CitationCard({ citation, onClose }: { citation: Citation; onClose: () =
 }
 
 function PaperRead() {
-  const { currentPaper, setCurrentPaper, setCurrentReport, uploadProgress, setUploadProgress } = usePaperStore();
+  const {
+    currentPaper,
+    currentReport,
+    setCurrentPaper,
+    setCurrentReport,
+    uploadProgress,
+    setUploadProgress,
+  } = usePaperStore();
   const { addNotification } = useUIStore();
 
   const [input, setInput] = useState('');
@@ -54,118 +142,221 @@ function PaperRead() {
   const [activeSection, setActiveSection] = useState(0);
   const [showCitation, setShowCitation] = useState<Citation | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [paperAgentId, setPaperAgentId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const reportSections = currentReport?.sections ?? [];
+
+  const resetPaper = useCallback(() => {
+    setCurrentPaper(null);
+    setCurrentReport(null);
+    setUploadProgress(0);
+    setIsUploading(false);
+    setConversationId(null);
+    setChatMessages([]);
+    setStreamText('');
+    setInput('');
+    setActiveSection(0);
+    setShowCitation(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [setCurrentPaper, setCurrentReport, setUploadProgress]);
+
+  useEffect(() => {
+    const loadPaperAgent = async () => {
+      try {
+        const response = await agentAPI.getAgents();
+        const agents = response.data as Agent[];
+        const paperAgent = agents.find(
+          (agent) => agent.category === 'paper-reading' || agent.name === '论文精读助手'
+        );
+
+        if (!paperAgent) {
+          addNotification({
+            type: 'warning',
+            message: '没有找到论文精读助手，请检查后端 /agents 或 Supabase agents 表',
+            duration: 5000,
+          });
+          return;
+        }
+
+        setPaperAgentId(paperAgent.id);
+      } catch {
+        addNotification({
+          type: 'error',
+          message: '获取论文精读助手失败，请检查后端 /agents',
+          duration: 5000,
+        });
+      }
+    };
+
+    loadPaperAgent();
+  }, [addNotification]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, streamText]);
 
-  // Mock report data
-  const mockReport = {
-    paper_id: '1',
-    sections: [
-      {
-        heading: '研究背景与动机',
-        content: 'Transformer 模型彻底改变了自然语言处理领域。在此之前，序列转导模型主要基于循环或卷积神经网络，难以并行化且长距离依赖建模能力有限。',
-        citations: [{ source: 'Section 1', text: 'The dominant sequence transduction models are based on complex recurrent or convolutional neural networks.', page: 1 }],
-      },
-      {
-        heading: '核心方法',
-        content: '本文提出的 Transformer 完全基于注意力机制，摒弃了循环和卷积结构。核心组件包括：\n- 多头自注意力机制\n- 位置编码\n- 编码器-解码器架构',
-        citations: [{ source: 'Section 3', text: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms.', page: 2 }],
-      },
-      {
-        heading: '实验结果',
-        content: '在 WMT 2014 英德翻译任务上，Transformer 达到了 28.4 BLEU 的 SOTA 结果。\n\n在英法翻译任务上达到了 41.8 BLEU。\n\n训练成本也大幅降低，仅需 3.5 天在 8 块 P100 上完成训练。',
-        citations: [
-          { source: 'Section 4', text: 'Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task.', page: 6 },
-          { source: 'Section 4', text: 'On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8.', page: 6 },
-        ],
-      },
-      {
-        heading: '关键结论',
-        content: '1. 注意力机制足以构建强大的序列转导模型\n2. Transformer 训练速度更快，并行化程度更高\n3. 在多个任务上取得了 SOTA 结果\n4. 为后续大语言模型的发展奠定了基础',
-        citations: [],
-      },
-    ],
-  };
-
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') {
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       addNotification({ type: 'warning', message: '请上传 PDF 文件', duration: 3000 });
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(0);
+    setUploadProgress(20);
+    setCurrentPaper(null);
+    setCurrentReport(null);
 
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      const nextProgress = Math.min(usePaperStore.getState().uploadProgress + 10, 90);
-      setUploadProgress(nextProgress);
-      if (nextProgress >= 90) {
-        clearInterval(interval);
-      }
-    }, 200);
+    try {
+      const response = await paperAPI.analyzePaper(file);
+      const analysis = response.data as PaperAnalysisResponse;
+      const parsedAnalysis = parseJsonLikeText(analysis.raw_analysis) || analysis;
+      const paperId = `${Date.now()}`;
+      const authors = Array.isArray(parsedAnalysis.authors)
+        ? parsedAnalysis.authors
+        : [parsedAnalysis.authors || 'Unknown'];
+      const sections = normalizeAnalysisSections(analysis);
 
-    // TODO: Replace with actual API call
-    // await paperAPI.upload(file, setUploadProgress);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      setUploadProgress(100);
-      setIsUploading(false);
       setCurrentPaper({
-        id: '1',
-        title: file.name.replace('.pdf', ''),
-        authors: ['Unknown'],
+        id: paperId,
+        title: parsedAnalysis.title || file.name.replace(/\.pdf$/i, ''),
+        authors,
         abstract: 'Uploaded paper',
         uploaded_at: new Date().toISOString(),
         status: 'completed',
       });
-      setCurrentReport(mockReport);
-      addNotification({ type: 'success', message: '论文上传成功', duration: 3000 });
-    }, 2500);
+      setCurrentReport({
+        paper_id: paperId,
+        sections,
+      });
+      setActiveSection(0);
+      setConversationId(null);
+      setChatMessages([
+        {
+          id: `${Date.now()}-ready`,
+          role: 'assistant',
+          content: '论文已解析完成，你可以询问研究背景、核心方法、实验结果、创新点和不足。',
+        },
+      ]);
+      setInput('');
+      setStreamText('');
+      setUploadProgress(100);
+      addNotification({ type: 'success', message: '论文解析完成', duration: 3000 });
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      addNotification({
+        type: 'error',
+        message: errorMessage.includes('论文解析超时')
+          ? errorMessage
+          : `论文解析失败，请检查后端是否启动或 PDF 是否可读取：${errorMessage}`,
+        duration: 5000,
+      });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleSendMessage = useCallback(async () => {
     if (!input.trim() || isStreaming) return;
 
+    if (!paperAgentId) {
+      addNotification({ type: 'warning', message: '论文精读助手还在加载，请稍后再试', duration: 3000 });
+      return;
+    }
+
+    const userInput = input.trim();
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: userInput,
     };
     setChatMessages((prev) => [...prev, userMsg]);
     setInput('');
 
     setIsStreaming(true);
-    setStreamText('');
+    setStreamText('正在思考...');
 
-    // Simulate streaming response
-    const response = '这是一个很好的问题。根据论文内容，Transformer 使用多头注意力机制来捕捉不同子空间的表示。每个注意力头可以关注不同的位置，从而增强模型的表达能力。';
+    try {
+      const safeSections = Array.isArray(reportSections) ? reportSections : [];
+      const paperContext = currentPaper && safeSections.length > 0
+        ? `
+【当前论文信息】
+标题：${currentPaper.title || 'Unknown'}
+作者：${currentPaper.authors?.join(', ') || 'Unknown'}
 
-    let index = 0;
-    let currentText = '';
-    const streamInterval = setInterval(() => {
-      if (index < response.length) {
-        currentText += response[index];
-        setStreamText(currentText);
-        index++;
-      } else {
-        clearInterval(streamInterval);
-        setIsStreaming(false);
-        setChatMessages((prev) => [
-          ...prev,
-          { id: (Date.now() + 1).toString(), role: 'assistant', content: currentText },
-        ]);
-        setStreamText('');
+【论文结构化精读报告】
+${safeSections.map((section, index) => `
+${index + 1}. ${section.heading}
+${section.content}
+引用：${section.citations?.map((citation) => citation.source).join(', ') || ''}
+`).join('\n')}
+
+请你基于以上论文信息回答用户问题，不要声称自己没有看到论文或无法访问论文。
+`.trim()
+        : '';
+      const messageForAgent = paperContext
+        ? `${paperContext}\n\n【用户问题】\n${userInput}`
+        : userInput;
+      let currentConversationId = conversationId;
+
+      if (!currentConversationId) {
+        const conversationResponse = await conversationAPI.createConversation({
+          agent_id: paperAgentId,
+          title: currentPaper ? `${currentPaper.title} 论文精读` : '论文精读对话',
+        });
+        currentConversationId = conversationResponse.data.id;
+
+        if (!currentConversationId) {
+          throw new Error('Create conversation response missing id');
+        }
+
+        setConversationId(currentConversationId);
       }
-    }, 50);
-  }, [input, isStreaming]);
+
+      const chatResponse = await conversationAPI.chat({
+        conversation_id: currentConversationId,
+        agent_id: paperAgentId,
+        message: messageForAgent,
+      });
+      const reply = chatResponse.data.reply;
+
+      if (!reply) {
+        throw new Error('Chat response missing reply');
+      }
+
+      setChatMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 1).toString(), role: 'assistant', content: reply },
+      ]);
+    } catch (error) {
+      addNotification({
+        type: 'error',
+        message: `论文精读回复失败，请稍后重试：${getErrorMessage(error)}`,
+        duration: 5000,
+      });
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: '论文精读助手暂时没有成功回复，请稍后再试。',
+        },
+      ]);
+    } finally {
+      setIsStreaming(false);
+      setStreamText('');
+    }
+  }, [addNotification, conversationId, currentPaper, input, isStreaming, paperAgentId, reportSections]);
 
   if (!currentPaper) {
     return (
@@ -191,7 +382,7 @@ function PaperRead() {
             {isUploading ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
-                上传中 {uploadProgress}%
+                正在解析论文，首次分析可能需要 1-3 分钟... {uploadProgress}%
               </>
             ) : (
               <>
@@ -207,9 +398,7 @@ function PaperRead() {
 
   return (
     <div className="h-full flex flex-col -m-6">
-      {/* Three-column layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left: Section Nav */}
         <div className="w-56 bg-sci-bg2 border-r border-sci-border flex-shrink-0 overflow-y-auto">
           <div className="p-4">
             <h3 className="text-sm font-semibold text-sci-muted mb-3 flex items-center gap-2">
@@ -217,7 +406,7 @@ function PaperRead() {
               章节导航
             </h3>
             <div className="space-y-1">
-              {mockReport.sections.map((section, index) => (
+              {reportSections.map((section, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveSection(index)}
@@ -234,18 +423,29 @@ function PaperRead() {
           </div>
         </div>
 
-        {/* Center: Report */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-3xl mx-auto">
             <div className="sci-card-glow mb-6">
-              <h1 className="text-2xl font-bold mb-2">{currentPaper.title}</h1>
-              <div className="flex items-center gap-3">
-                <span className="sci-badge-info">PDF</span>
-                <span className="text-sm text-sci-muted">{currentPaper.authors.join(', ')}</span>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold mb-2">{currentPaper.title}</h1>
+                  <div className="flex items-center gap-3">
+                    <span className="sci-badge-info">PDF</span>
+                    <span className="text-sm text-sci-muted">{currentPaper.authors.join(', ')}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={resetPaper}
+                  className="sci-btn-secondary flex-shrink-0 text-sm"
+                >
+                  <Upload size={16} />
+                  重新上传论文
+                </button>
               </div>
             </div>
 
-            {mockReport.sections.map((section, index) => (
+            {reportSections.map((section, index) => (
               <div key={index} id={`section-${index}`} className="mb-8">
                 <h2 className="text-xl font-semibold text-sci-accent mb-4 flex items-center gap-2">
                   <span className="w-6 h-6 rounded bg-sci-primary/20 text-sci-accent text-xs flex items-center justify-center">
@@ -276,7 +476,6 @@ function PaperRead() {
           </div>
         </div>
 
-        {/* Right: Chat */}
         <div className="w-80 bg-sci-bg2 border-l border-sci-border flex-shrink-0 flex flex-col">
           <div className="p-3 border-b border-sci-border">
             <h3 className="text-sm font-semibold flex items-center gap-2">
