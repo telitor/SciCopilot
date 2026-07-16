@@ -498,6 +498,12 @@ def chat(
     if not conversation.data:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
+    if conversation.data[0]["agent_id"] != payload.agent_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Conversation agent does not match the requested agent",
+        )
+
     # 2. 妫€鏌?agent 鏄惁瀛樺湪
     agent = (
         supabase.table("agents")

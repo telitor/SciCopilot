@@ -20,7 +20,7 @@ const navItems = [
   { path: '/paper/read', label: '论文精读', icon: FileText, module: 'paper' },
   { path: '/paper/library', label: '论文库', icon: BookOpen, module: 'library' },
   { path: '/research/decompose', label: '问题拆解', icon: GitBranch, module: 'research' },
-  { path: '/experiment/roadmap', label: '实验路线', icon: Route, module: 'experiment' },
+  { path: '/experiment/roadmap', label: '项目规划', icon: Route, module: 'experiment' },
   { path: '/code/reproduce', label: '代码复现', icon: Code2, module: 'code' },
   { path: '/result/analyze', label: '结果分析', icon: BarChart3, module: 'result' },
   { path: '/kg/explore', label: '知识图谱', icon: Share2, module: 'kg' },

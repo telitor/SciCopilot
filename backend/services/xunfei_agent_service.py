@@ -43,6 +43,11 @@ CODE_REPRODUCTION_API_KEY = os.getenv("CODE_REPRODUCTION_API_KEY")
 CODE_REPRODUCTION_API_SECRET = os.getenv("CODE_REPRODUCTION_API_SECRET")
 CODE_REPRODUCTION_WS_URL = os.getenv("CODE_REPRODUCTION_WS_URL")
 
+PROJECT_PLANNING_APP_ID = os.getenv("PROJECT_PLANNING_APP_ID")
+PROJECT_PLANNING_API_KEY = os.getenv("PROJECT_PLANNING_API_KEY")
+PROJECT_PLANNING_API_SECRET = os.getenv("PROJECT_PLANNING_API_SECRET")
+PROJECT_PLANNING_WS_URL = os.getenv("PROJECT_PLANNING_WS_URL")
+
 XF_AGENT_DOMAIN = os.getenv("XF_AGENT_DOMAIN", "generalv3")
 XF_AGENT_TEMPERATURE = float(os.getenv("XF_AGENT_TEMPERATURE", "0.5"))
 XF_AGENT_TOP_K = int(os.getenv("XF_AGENT_TOP_K", "4"))
@@ -72,6 +77,20 @@ def _build_paper_reading_ws_url() -> str:
     return f"wss://{XF_AGENT_WS_HOST}{path}"
 
 
+def _normalize_ws_url(ws_url: str) -> str:
+    normalized = ws_url.strip().strip("'\"").strip()
+    parsed = urlparse(normalized)
+
+    if (
+        parsed.scheme not in {"ws", "wss"}
+        or not parsed.hostname
+        or not parsed.path
+    ):
+        raise RuntimeError("Invalid Xunfei WebSocket URL")
+
+    return normalized
+
+
 def _get_config_for_category(agent_category: str) -> XunfeiAgentConfig:
     configs = {
         "paper-reading": XunfeiAgentConfig(
@@ -98,6 +117,12 @@ def _get_config_for_category(agent_category: str) -> XunfeiAgentConfig:
             api_secret=CODE_REPRODUCTION_API_SECRET or "",
             ws_url=CODE_REPRODUCTION_WS_URL or "",
         ),
+        "project-planning": XunfeiAgentConfig(
+            app_id=PROJECT_PLANNING_APP_ID or "",
+            api_key=PROJECT_PLANNING_API_KEY or "",
+            api_secret=PROJECT_PLANNING_API_SECRET or "",
+            ws_url=PROJECT_PLANNING_WS_URL or "",
+        ),
     }
 
     config = configs.get(agent_category)
@@ -106,16 +131,18 @@ def _get_config_for_category(agent_category: str) -> XunfeiAgentConfig:
     ):
         raise RuntimeError(f"Missing Xunfei config for category: {agent_category}")
 
-    return config
+    return XunfeiAgentConfig(
+        app_id=config.app_id,
+        api_key=config.api_key,
+        api_secret=config.api_secret,
+        ws_url=_normalize_ws_url(config.ws_url),
+    )
 
 
 def _build_signed_ws_url(ws_url: str, api_key: str, api_secret: str) -> str:
-    parsed = urlparse(ws_url)
+    parsed = urlparse(_normalize_ws_url(ws_url))
     host = parsed.netloc
     path = parsed.path or "/"
-
-    if not parsed.scheme or not host:
-        raise RuntimeError("Invalid Xunfei WebSocket URL")
 
     date = formatdate(usegmt=True)
     signature_origin = (

@@ -69,6 +69,7 @@ def generate_reply(
         "problem-decomposition",
         "result-interpretation",
         "code-reproduction",
+        "project-planning",
     }
 
     if agent_category in xunfei_agent_categories:

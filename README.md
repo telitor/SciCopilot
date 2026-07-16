@@ -1,145 +1,104 @@
 <div align="center">
 
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&height=280&color=0:020617,25:0F172A,50:1D4ED8,75:7C3AED,100:06B6D4&text=SciPilot&fontSize=82&fontColor=FFFFFF&animation=fadeIn&fontAlignY=36&desc=AI-Powered%20Research%20Engineering%20Agent%20Platform&descAlignY=57&descSize=20" />
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&height=260&color=0:0F172A,40:1D4ED8,70:7C3AED,100:EC4899&text=SciPilot&fontSize=78&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=AI-powered%20Research%20Agent%20Platform%20for%20Software%20Engineering&descAlignY=58&descSize=18" />
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=600&size=27&duration=2600&pause=650&color=38BDF8&center=true&vCenter=true&multiline=false&repeat=true&width=1000&lines=Five+Research+Agents+%C2%B7+One+Unified+Platform;Paper+Reading+%C2%B7+Problem+Decomposition+%C2%B7+Result+Analysis;Code+Reproduction+%C2%B7+Project+Planning;React+%2B+FastAPI+%2B+Supabase+%2B+Agent+Runtime" />
+<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=28&duration=2800&pause=700&color=38BDF8&center=true&vCenter=true&width=900&lines=AI+Research+Agent+Platform;Paper+Reading+%C2%B7+Structured+Analysis+%C2%B7+Intelligent+Q%26A;Built+with+React+%2B+FastAPI+%2B+Supabase;Designed+for+Software+Engineering+Research" />
 
 <br/>
 
-<img src="https://img.shields.io/badge/Release-MVP%20Closed--Loop-7C3AED?style=for-the-badge&logo=rocket&logoColor=white" />
-<img src="https://img.shields.io/badge/Research%20Agents-5%20Integrated-0891B2?style=for-the-badge&logo=probot&logoColor=white" />
+<img src="https://img.shields.io/badge/Status-MVP%20Closed--Loop-7C3AED?style=for-the-badge&logo=rocket&logoColor=white" />
+<img src="https://img.shields.io/badge/Core%20Agent-Paper%20Reading-06B6D4?style=for-the-badge&logo=openai&logoColor=white" />
 <img src="https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-2563EB?style=for-the-badge&logo=react&logoColor=white" />
 <img src="https://img.shields.io/badge/Backend-FastAPI-059669?style=for-the-badge&logo=fastapi&logoColor=white" />
-<img src="https://img.shields.io/badge/Data-Supabase-16A34A?style=for-the-badge&logo=supabase&logoColor=white" />
+<img src="https://img.shields.io/badge/Database-Supabase-16A34A?style=for-the-badge&logo=supabase&logoColor=white" />
 
 <br/><br/>
 
-<img src="https://img.shields.io/github/stars/telitor/SciPilot?style=flat-square&logo=github&label=Stars" />
-<img src="https://img.shields.io/github/forks/telitor/SciPilot?style=flat-square&logo=github&label=Forks" />
-<img src="https://img.shields.io/github/last-commit/telitor/SciPilot?style=flat-square&logo=git&label=Last%20Commit" />
-<img src="https://img.shields.io/github/issues/telitor/SciPilot?style=flat-square&logo=github&label=Issues" />
-
-<br/><br/>
-
-<img src="https://skillicons.dev/icons?i=react,ts,vite,tailwind,py,fastapi,supabase,postgres,git,github,vscode" />
-
-<br/>
-
-### 面向软件工程科研场景的多智能体协同平台  
-### Multi-Agent Research Copilot for Software Engineering
+<img src="https://skillicons.dev/icons?i=react,ts,vite,tailwind,py,fastapi,supabase,postgres,github,vscode" />
 
 </div>
 
 ---
 
-## 🌌 Project Overview · 项目概览
+## ✨ Overview 项目概览
 
-**SciPilot** 是一个面向软件工程学习、科研分析与项目实践的 AI Research Agent Platform。
+**SciPilot** is an AI-powered research agent platform designed for **Software Engineering** scenarios.
 
-平台将论文解析、研究问题拆解、实验结果分析、代码复现指导与项目路线规划整合到统一工作流中，并通过 **React + FastAPI + Supabase + 独立 Agent Runtime** 构建完整的前后端闭环。
+SciPilot 是一个面向 **软件工程科研与学习场景** 的 AI 智能体平台，围绕论文精读、结构化分析、智能问答与科研工作流组织，构建一个可持续扩展的垂直领域 Agent 系统。
 
-> SciPilot is not a general-purpose chatbot.  
-> 它不是普通聊天工具，而是面向真实科研任务的智能工程工作台。
+It integrates **paper reading**, **structured analysis**, **intelligent Q&A**, **conversation management**, and **database persistence** into a unified research workflow.
+
+> SciPilot is not a general chatbot.  
+> 它不是一个普通聊天工具，而是面向软件工程领域的 **AI Research Copilot**。
 
 ---
 
-## ⚡ Five-Agent Matrix · 五大核心智能体
+## 🚀 Core Workflow 核心流程
+
+```mermaid
+flowchart LR
+    A[User Login 用户登录] --> B[Upload PDF 上传论文]
+    B --> C[Backend Extracts Text 后端解析文本]
+    C --> D[Paper Reading Agent 论文精读智能体]
+    D --> E[Structured Paper Report 结构化精读报告]
+    E --> F[Frontend Visualization 前端展示]
+    F --> G[Paper-based Q&A 论文追问]
+    G --> H[Conversation Saved 消息保存至 Supabase]
+```
+
+---
+
+## 🧠 Key Features 核心能力
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td width="50%">
 
-### 📄 Paper Reading Agent  
-### 论文精读助手
+### 📄 Paper Reading Agent 论文精读智能体
 
-- PDF 论文上传与文本提取
-- 研究背景与核心问题识别
-- 方法、实验与结论结构化分析
-- 基于当前论文上下文持续追问
-- 支持重新上传与切换论文
-
-**Category**
-
-```text
-paper-reading
-```
+- PDF paper upload / PDF 论文上传
+- Text extraction / 文本解析
+- Structured analysis / 结构化分析
+- Research background summary / 研究背景总结
+- Core method explanation / 核心方法解释
+- Experiment result extraction / 实验结果提取
+- Key conclusion generation / 关键结论生成
 
 </td>
-<td width="50%" valign="top">
+<td width="50%">
 
-### 🧩 Problem Decomposition Agent  
-### 问题拆解助手
+### 💬 Intelligent Paper Q&A 智能论文追问
 
-- 将复杂研究方向拆解为可执行问题
-- 分析目标、约束、输入与输出
-- 提炼核心难点与关键子任务
-- 生成分阶段研究与实现路径
-- 适用于课题分析与需求拆解
-
-**Category**
-
-```text
-problem-decomposition
-```
+- Ask questions based on current paper / 基于当前论文提问
+- Context-aware discussion / 上下文感知回答
+- Agent-powered responses / 智能体生成回复
+- User / assistant message persistence / 消息持久化
+- Conversation-based interaction / 会话式交互
 
 </td>
 </tr>
 
 <tr>
-<td width="50%" valign="top">
+<td width="50%">
 
-### 📊 Result Interpretation Agent  
-### 结果分析助手
+### 🔐 Secure Authentication 安全认证
 
-- CSV、JSON、Excel 等结果分析
-- 指标含义与变化趋势解释
-- 模型对比与异常现象定位
-- 分析结论边界与实验可信度
-- 输出改进方向与验证建议
-
-**Category**
-
-```text
-result-interpretation
-```
+- Supabase Auth login / 用户登录
+- Token-based authorization / Token 鉴权
+- Protected backend APIs / 受保护后端接口
+- User-level data isolation / 用户级数据隔离
 
 </td>
-<td width="50%" valign="top">
+<td width="50%">
 
-### 🧬 Code Reproduction Agent  
-### 代码复现助手
+### 🧩 Extensible Agent Platform 可扩展智能体平台
 
-- GitHub 仓库复现路线规划
-- Python 环境与依赖配置
-- 项目模块、配置文件与入口分析
-- 运行日志和错误信息诊断
-- 生成可执行的复现步骤
-
-**Category**
-
-```text
-code-reproduction
-```
-
-</td>
-</tr>
-
-<tr>
-<td colspan="2" valign="top">
-
-### 🚀 Project Planning Agent · 项目规划助手
-
-- 将项目目标转化为完整技术路线
-- 拆分需求、开发、测试与部署阶段
-- 规划阶段任务、里程碑与验收标准
-- 分析人员分工、风险与依赖关系
-- 适用于科研项目、软件工程项目和竞赛规划
-
-**Category**
-
-```text
-project-planning
-```
+- Paper Reading Agent / 论文精读助手
+- Problem Decomposition Agent / 问题拆解助手
+- Result Interpretation Agent / 结果分析助手
+- Code Reproduction Agent / 代码复现助手
+- Project Planning Agent / 项目规划助手（MVP Integrated）
+- Future multi-agent collaboration / 未来多 Agent 协作
 
 </td>
 </tr>
@@ -147,218 +106,138 @@ project-planning
 
 ---
 
-## 🔄 Unified Agent Workflow · 统一调用闭环
-
-```mermaid
-flowchart LR
-    U["User 用户"] --> F["React Frontend"]
-    F --> A["GET /agents"]
-    A --> C["Resolve Agent by Category"]
-    C --> D["POST /conversations"]
-    D --> H["POST /chat"]
-    H --> R["FastAPI Agent Router"]
-    R --> X["Independent Agent Runtime"]
-    X --> R
-    R --> M["Save Messages"]
-    M --> S["Supabase PostgreSQL"]
-    R --> F
-    F --> U
-```
-
-每个 Agent 均复用统一业务链路：
-
-```text
-页面加载
-  ↓
-根据 category 获取 agent_id
-  ↓
-创建 Conversation
-  ↓
-发送 POST /chat
-  ↓
-后端选择对应 Agent 配置
-  ↓
-调用独立 WebSocket Agent
-  ↓
-返回 Reply
-  ↓
-保存 User / Assistant Messages
-```
-
----
-
-## 🏗️ System Architecture · 系统架构
+## 🏗️ Architecture 系统架构
 
 ```mermaid
 flowchart TB
-    subgraph Client["Client Layer · 客户端层"]
-        UI["React + TypeScript"]
-        ROUTER["React Router"]
-        STORE["Zustand"]
-        HTTP["Axios API Client"]
+    subgraph Frontend["Frontend Layer 前端层"]
+        F1["React"]
+        F2["TypeScript"]
+        F3["Vite"]
+        F4["Tailwind CSS"]
     end
 
-    subgraph Service["Service Layer · 服务层"]
-        API["FastAPI"]
-        AUTH["Authentication Service"]
-        PAPER["Paper Analyze Service"]
-        CHAT["Unified Chat Service"]
-        DISPATCH["Agent Category Dispatcher"]
+    subgraph Backend["Backend Layer 后端层"]
+        B1["FastAPI"]
+        B2["Auth APIs"]
+        B3["Paper Analyze API"]
+        B4["Chat API"]
     end
 
-    subgraph AgentLayer["Agent Runtime Layer · 智能体运行层"]
-        PA["Paper Reading"]
-        PD["Problem Decomposition"]
-        RI["Result Interpretation"]
-        CR["Code Reproduction"]
-        PP["Project Planning"]
+    subgraph Database["Supabase Layer 数据层"]
+        S1["Supabase Auth"]
+        S2["PostgreSQL"]
+        S3["Row Level Security"]
+        S4["Conversations & Messages"]
     end
 
-    subgraph Data["Data Layer · 数据层"]
-        SA["Supabase Auth"]
-        DB["PostgreSQL"]
-        RLS["Row Level Security"]
-        MSG["Conversations & Messages"]
+    subgraph Agent["Agent Layer 智能体层"]
+        A1["Paper Reading Agent"]
+        A2["Structured Analysis"]
+        A3["Intelligent Q&A"]
     end
 
-    UI --> ROUTER
-    ROUTER --> STORE
-    STORE --> HTTP
-    HTTP --> API
-
-    API --> AUTH
-    API --> PAPER
-    API --> CHAT
-    CHAT --> DISPATCH
-
-    DISPATCH --> PA
-    DISPATCH --> PD
-    DISPATCH --> RI
-    DISPATCH --> CR
-    DISPATCH --> PP
-
-    AUTH --> SA
-    API --> DB
-    DB --> RLS
-    DB --> MSG
+    Frontend --> Backend
+    Backend --> Database
+    Backend --> Agent
+    Agent --> Backend
+    Backend --> Frontend
 ```
 
 ---
 
-## ✨ Core Capabilities · 核心能力
+## ⚙️ Tech Stack 技术栈
 
-| Capability | Description | Status |
-|---|---|---|
-| User Authentication | Supabase Auth 用户注册、登录与 Token 鉴权 | ✅ Integrated |
-| Agent Discovery | 根据 category 动态获取对应 Agent | ✅ Integrated |
-| Conversation Management | 创建、查询和管理用户会话 | ✅ Integrated |
-| Message Persistence | 保存 user / assistant 消息 | ✅ Integrated |
-| PDF Analysis | PDF 上传、解析与结构化精读 | ✅ Integrated |
-| Contextual Paper Q&A | 基于当前论文内容持续追问 | ✅ Integrated |
-| Problem Decomposition | 研究问题结构化拆解 | ✅ Integrated |
-| Result Interpretation | 实验数据与模型结果分析 | ✅ Integrated |
-| Code Reproduction | 仓库复现、环境配置与报错诊断 | ✅ Integrated |
-| Project Planning | 技术路线、里程碑与风险规划 | ✅ Integrated |
-| Independent Agent Config | 每个 Agent 支持独立平台配置 | ✅ Integrated |
-| RLS Data Isolation | 用户数据权限隔离 | ✅ Enabled |
+| Layer 层级 | Technologies 技术 |
+|---|---|
+| Frontend 前端 | React, TypeScript, Vite, Tailwind CSS, Zustand, Axios |
+| Backend 后端 | Python, FastAPI, Uvicorn, Pydantic |
+| Database 数据库 | Supabase PostgreSQL |
+| Authentication 认证 | Supabase Auth |
+| Permission 权限 | Row Level Security |
+| Agent Service 智能体服务 | Backend-proxied Paper Reading Agent |
+| Document Processing 文档处理 | PDF Text Extraction |
 
 ---
 
-## 🧠 Agent Dispatch Strategy · 智能体调度策略
-
-FastAPI 后端根据 Supabase `agents.category` 选择对应运行配置：
-
-```mermaid
-flowchart LR
-    CHAT["POST /chat"] --> QUERY["Query Agent Record"]
-    QUERY --> CATEGORY{"agent.category"}
-
-    CATEGORY -->|paper-reading| A1["Paper Reading Config"]
-    CATEGORY -->|problem-decomposition| A2["Problem Decomposition Config"]
-    CATEGORY -->|result-interpretation| A3["Result Interpretation Config"]
-    CATEGORY -->|code-reproduction| A4["Code Reproduction Config"]
-    CATEGORY -->|project-planning| A5["Project Planning Config"]
-
-    A1 --> WS["Unified WebSocket Caller"]
-    A2 --> WS
-    A3 --> WS
-    A4 --> WS
-    A5 --> WS
-
-    WS --> REPLY["Agent Reply"]
-```
-
-前端只接触平台业务接口，不接触：
+## 🧬 Current MVP Closed Loop 当前 MVP 闭环
 
 ```text
-APP ID
-API Key
-API Secret
-WebSocket URL
-Assistant ID
-Service Role Key
+Login 用户登录
+  ↓
+Upload PDF 上传论文
+  ↓
+Analyze Paper 论文解析
+  ↓
+Generate Structured Report 生成结构化报告
+  ↓
+Ask Paper-related Questions 基于论文追问
+  ↓
+Agent Replies 智能体回答
+  ↓
+Save Messages 消息保存
+  ↓
+Display Conversation 前端展示对话
 ```
 
----
+### Current Capabilities 当前能力
 
-## ⚙️ Technology Stack · 技术栈
-
-| Layer | Technologies |
+| Module 模块 | Status 状态 |
 |---|---|
-| Frontend | React, TypeScript, Vite, Tailwind CSS |
-| State & Routing | Zustand, React Router |
-| HTTP Client | Axios |
-| Backend | Python, FastAPI, Uvicorn, Pydantic |
-| Authentication | Supabase Auth |
-| Database | Supabase PostgreSQL |
-| Authorization | Row Level Security |
-| Document Processing | PyPDF / PDF Text Extraction |
-| Agent Communication | Authenticated WebSocket |
-| Version Control | Git, GitHub |
+| Project Structure 项目结构 | ✅ Completed |
+| Supabase Schema 数据库结构 | ✅ Completed |
+| RLS Policies 权限策略 | ✅ Completed |
+| FastAPI Backend 后端接口 | ✅ Completed |
+| Auth APIs 登录鉴权 | ✅ Completed |
+| Agent List API 智能体列表 | ✅ Completed |
+| Conversation APIs 会话接口 | ✅ Completed |
+| Message Persistence 消息保存 | ✅ Completed |
+| Paper Reading Agent 论文精读 Agent | ✅ Integrated |
+| PDF Upload PDF 上传 | ✅ MVP Completed |
+| Paper Analysis 论文分析 | ✅ MVP Completed |
+| Paper Q&A 论文追问 | ✅ MVP Completed |
+| Re-upload Paper 重新上传 | ✅ MVP Completed |
+| Problem Decomposition Agent 问题拆解 Agent | ✅ Integrated |
+| Result Interpretation Agent 结果分析 Agent | ✅ Integrated |
+| Code Reproduction Agent 代码复现 Agent | ✅ Integrated |
+| Project Planning Agent 项目规划 Agent | ✅ MVP Integrated |
+| Frontend-Backend Loop 前后端闭环 | ✅ Running Locally |
+
+### Multi-Agent Status 多 Agent 状态
+
+| Agent | Category | Status |
+|---|---|---|
+| 论文精读助手 | `paper-reading` | ✅ Integrated |
+| 问题拆解助手 | `problem-decomposition` | ✅ Integrated |
+| 结果分析助手 | `result-interpretation` | ✅ Integrated |
+| 代码复现助手 | `code-reproduction` | ✅ Integrated |
+| 项目规划助手 | `project-planning` | ✅ MVP Integrated |
 
 ---
 
-## 🔌 API Overview · 接口概览
+## 🔌 API Overview 接口概览
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/` | 服务健康检查 |
-| `POST` | `/auth/login` | 用户登录 |
-| `POST` | `/auth/register` | 用户注册 |
-| `GET` | `/users/me` | 获取当前用户 |
-| `GET` | `/agents` | 获取公开智能体 |
-| `POST` | `/conversations` | 创建会话 |
-| `GET` | `/conversations` | 查询会话列表 |
-| `GET` | `/conversations/{conversation_id}/messages` | 查询会话消息 |
-| `POST` | `/chat` | 统一 Agent 对话接口 |
-| `POST` | `/papers/analyze` | PDF 解析与论文精读 |
-
-### Unified Chat Request
-
-```json
-{
-  "conversation_id": "conversation_uuid",
-  "agent_id": "agent_uuid",
-  "message": "用户输入内容"
-}
-```
-
-### Unified Chat Response
-
-```json
-{
-  "reply": "智能体生成的回复"
-}
-```
+| `GET` | `/` | Health check / 健康检查 |
+| `POST` | `/auth/login` | User login / 用户登录 |
+| `POST` | `/auth/register` | User registration / 用户注册 |
+| `GET` | `/users/me` | Current user / 当前用户 |
+| `GET` | `/agents` | Get agent list / 获取智能体列表 |
+| `POST` | `/conversations` | Create conversation / 创建对话 |
+| `GET` | `/conversations` | List conversations / 查询对话 |
+| `GET` | `/conversations/{conversation_id}/messages` | List messages / 查询消息 |
+| `POST` | `/chat` | Agent chat / 智能体对话 |
+| `POST` | `/papers/analyze` | Analyze uploaded paper / 论文解析 |
 
 ---
 
-## 🗂️ Database Model · 数据模型
+## 🗂️ Database Model 数据模型
 
 ```mermaid
 erDiagram
-    PROFILES {
-        uuid id PK
+    profiles {
+        uuid id
         text email
         text username
         text avatar_url
@@ -366,8 +245,8 @@ erDiagram
         timestamptz updated_at
     }
 
-    AGENTS {
-        uuid id PK
+    agents {
+        uuid id
         text name
         text description
         text category
@@ -377,39 +256,38 @@ erDiagram
         timestamptz updated_at
     }
 
-    CONVERSATIONS {
-        uuid id PK
-        uuid user_id FK
-        uuid agent_id FK
+    conversations {
+        uuid id
+        uuid user_id
+        uuid agent_id
         text title
         timestamptz created_at
         timestamptz updated_at
     }
 
-    MESSAGES {
-        uuid id PK
-        uuid conversation_id FK
-        uuid user_id FK
+    messages {
+        uuid id
+        uuid conversation_id
+        uuid user_id
         text role
         text content
         timestamptz created_at
     }
 
-    PROFILES ||--o{ CONVERSATIONS : owns
-    AGENTS ||--o{ CONVERSATIONS : powers
-    CONVERSATIONS ||--o{ MESSAGES : contains
+    profiles ||--o{ conversations : owns
+    agents ||--o{ conversations : powers
+    conversations ||--o{ messages : contains
 ```
 
 ---
 
-## 📁 Project Structure · 项目结构
+## 📁 Project Structure 项目结构
 
 ```text
 SciPilot
 ├── Agent
 │   ├── PaperReading.md
-│   ├── ProjectPlanning.md
-│   └── ...
+│   └── ProjectPlanning.md
 │
 ├── backend
 │   ├── main.py
@@ -424,11 +302,8 @@ SciPilot
 │   ├── public
 │   ├── src
 │   │   ├── components
-│   │   │   ├── AgentChatPanel.tsx
-│   │   │   └── NotificationContainer.tsx
 │   │   ├── pages
 │   │   ├── services
-│   │   │   └── api.ts
 │   │   ├── store
 │   │   └── main.tsx
 │   ├── package.json
@@ -450,245 +325,160 @@ SciPilot
 
 ---
 
-<details>
-<summary><strong>🖥️ Local Development · 本地运行</strong></summary>
+## 🖥️ Local Development 本地运行
 
-<br/>
-
-### 1. Clone Repository
+### 1. Clone Repository 克隆项目
 
 ```bash
 git clone https://github.com/telitor/SciPilot.git
 cd SciPilot
 ```
 
-### 2. Backend Setup
+---
 
-```powershell
+### 2. Start Backend 启动后端
+
+```bash
 cd backend
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env
 python -m uvicorn main:app --reload
 ```
 
-Backend API：
+Backend 后端地址：
 
 ```text
 http://localhost:8000
 ```
 
-Swagger：
+Swagger API Docs 接口文档：
 
 ```text
 http://localhost:8000/docs
 ```
 
-### 3. Frontend Setup
+---
 
-```powershell
+### 3. Start Frontend 启动前端
+
+```bash
 cd frontend
 npm install
 copy .env.example .env
 npm run dev
 ```
 
-Frontend：
+Frontend 前端地址：
 
 ```text
 http://localhost:5173
 ```
 
-</details>
-
 ---
 
-<details>
-<summary><strong>🔐 Environment Variables · 环境变量</strong></summary>
+## 🔑 Environment Variables 环境变量
 
-<br/>
-
-所有真实密钥只允许写入：
-
-```text
-backend/.env
-```
-
-示例结构：
+### Backend `.env`
 
 ```env
-# Supabase
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-# Paper Reading Agent
 XF_AGENT_APP_ID=your_app_id
 XF_AGENT_API_KEY=your_api_key
 XF_AGENT_API_SECRET=your_api_secret
 XF_AGENT_ASSISTANT_ID=your_assistant_id
 
-# Problem Decomposition Agent
-PROBLEM_DECOMPOSITION_APP_ID=your_app_id
-PROBLEM_DECOMPOSITION_API_KEY=your_api_key
-PROBLEM_DECOMPOSITION_API_SECRET=your_api_secret
-PROBLEM_DECOMPOSITION_WS_URL=wss://your_websocket_url
-
-# Result Interpretation Agent
-RESULT_INTERPRETATION_APP_ID=your_app_id
-RESULT_INTERPRETATION_API_KEY=your_api_key
-RESULT_INTERPRETATION_API_SECRET=your_api_secret
-RESULT_INTERPRETATION_WS_URL=wss://your_websocket_url
-
-# Code Reproduction Agent
-CODE_REPRODUCTION_APP_ID=your_app_id
-CODE_REPRODUCTION_API_KEY=your_api_key
-CODE_REPRODUCTION_API_SECRET=your_api_secret
-CODE_REPRODUCTION_WS_URL=wss://your_websocket_url
-
-# Project Planning Agent
-PROJECT_PLANNING_APP_ID=your_app_id
-PROJECT_PLANNING_API_KEY=your_api_key
-PROJECT_PLANNING_API_SECRET=your_api_secret
-PROJECT_PLANNING_WS_URL=wss://your_websocket_url
+PROJECT_PLANNING_APP_ID=your_project_planning_app_id
+PROJECT_PLANNING_API_KEY=your_project_planning_api_key
+PROJECT_PLANNING_API_SECRET=your_project_planning_api_secret
+PROJECT_PLANNING_WS_URL=wss://your_project_planning_websocket_url
 ```
 
-前端仅使用：
+### Frontend `.env`
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
-
-</details>
 
 ---
 
-## 🛡️ Security Architecture · 安全架构
+## 🛡️ Security Design 安全设计
 
 ```mermaid
 flowchart LR
-    FRONTEND["Frontend"] -->|"Bearer Token"| BACKEND["FastAPI Backend"]
-    BACKEND -->|"Service Role"| SUPABASE["Supabase"]
-    BACKEND -->|"Signed WebSocket"| AGENTS["Independent Agents"]
-
-    FRONTEND -. "No Secret Access" .-> AGENTS
-    FRONTEND -. "No Service Role Access" .-> SUPABASE
+    A[Frontend 前端] -->|Only anon key| B[FastAPI Backend 后端]
+    B -->|Service role key| C[Supabase]
+    B -->|Agent secret| D[Paper Reading Agent]
+    A -. forbidden .-> D
+    A -. forbidden .-> C
 ```
 
-- 前端不保存 Agent 密钥
-- 前端不保存 Supabase Service Role Key
-- Agent 请求统一由 FastAPI 代理
-- `.env` 文件不提交至 GitHub
-- Supabase RLS 隔离用户数据
-- WebSocket 鉴权在服务端完成
+- Frontend never stores service role key. / 前端不保存 service role key。
+- Frontend never stores Agent API Key or Secret. / 前端不保存 Agent 密钥。
+- All sensitive keys stay in `backend/.env`. / 敏感密钥仅存放在后端环境变量中。
+- Agent calls are proxied by FastAPI. / Agent 调用统一由 FastAPI 后端代理。
+- Supabase RLS protects user data. / Supabase RLS 保障用户数据隔离。
 
 ---
 
-## 🧪 MVP Verification · 闭环验证
-
-```text
-✅ 用户注册与登录
-✅ Token 鉴权
-✅ Agent 动态发现
-✅ 会话创建
-✅ 消息持久化
-✅ PDF 上传与解析
-✅ 论文结构化精读
-✅ 基于论文上下文问答
-✅ 问题拆解 Agent
-✅ 结果分析 Agent
-✅ 代码复现 Agent
-✅ 项目规划 Agent
-✅ 独立 Agent 配置
-✅ 统一 /chat 调度
-✅ 前端构建通过
-✅ 本地全链路运行
-```
-
----
-
-## 🧭 Roadmap · 发展路线
+## 🧭 Roadmap 发展路线
 
 ```mermaid
 timeline
-    title SciPilot Evolution Roadmap
+    title SciPilot Development Roadmap
 
-    MVP Closed Loop
-      : Five Agents Integrated
-      : Authentication
-      : Conversation Persistence
-      : PDF Paper Analysis
+    MVP
+      : User Login 用户登录
+      : PDF Upload PDF 上传
+      : Paper Analysis 论文分析
+      : Paper Q&A 论文追问
+      : Message Persistence 消息保存
 
-    Next Stage
-      : Agent Conversation History
-      : Paper Library
-      : File Storage
-      : Streaming Responses
-      : Unified Workspace
+    Next
+      : Paper History 论文历史
+      : Long-term Paper Context 长期论文上下文
+      : Better JSON Stabilization 输出稳定化
+      : More Robust PDF Parsing PDF 解析增强
 
-    Advanced Stage
-      : Multi-Agent Collaboration
-      : Task Orchestration
-      : Knowledge Graph
-      : Research Memory
-      : Cloud Deployment
-
-    Future Vision
-      : Autonomous Research Workflow
-      : Experiment Reproduction Pipeline
-      : Intelligent Project Management
-      : Software Engineering Agent Ecosystem
+    Future
+      : Multi-Agent Collaboration 多 Agent 协作
+      : Code Explanation Agent 代码解释智能体
+      : Experiment Reproduction Agent 实验复现智能体
+      : Literature Review Agent 文献综述智能体
+      : Knowledge Graph 知识图谱
+      : Cloud Deployment 云端部署
 ```
 
 ---
 
-## 🌠 Vision · 项目愿景
+## 🌌 Vision 项目愿景
 
-SciPilot 致力于构建一个真正服务于软件工程学习者、科研初学者与开发团队的智能科研工作台。
+SciPilot aims to become a specialized AI research copilot for software engineering students, researchers, and developers.
 
-从阅读一篇论文开始，逐步连接：
+SciPilot 致力于成为面向软件工程学习者、科研初学者与开发者的智能科研副驾驶。
 
-```text
-Paper Reading
-    ↓
-Problem Decomposition
-    ↓
-Result Interpretation
-    ↓
-Code Reproduction
-    ↓
-Project Planning
-    ↓
-Intelligent Research Workflow
-```
+It focuses on:
 
-我们的目标不仅是让 AI 回答问题，更是让 AI 参与真实科研与软件工程任务的组织、执行与沉淀。
-
----
-
-## 👥 Contributors · 项目贡献者
-
-<div align="center">
-
-<a href="https://github.com/telitor/SciPilot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=telitor/SciPilot" />
-</a>
-
-</div>
+- understanding research papers / 理解科研论文
+- organizing research knowledge / 组织科研知识
+- supporting paper-based conversations / 支持基于论文的持续对话
+- connecting AI agents with real workflows / 将 AI Agent 接入真实科研流程
+- building a scalable multi-agent research platform / 构建可扩展的多智能体科研平台
 
 ---
 
 <div align="center">
 
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&height=170&color=0:06B6D4,35:2563EB,65:7C3AED,100:020617&section=footer" />
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&height=150&color=0:EC4899,40:7C3AED,70:2563EB,100:0F172A&section=footer" />
 
-### 🚀 SciPilot · AI Research Engineering Copilot
+<h3>🚀 SciPilot · AI Research Copilot for Software Engineering</h3>
 
-**Five Agents. One Platform. Infinite Research Possibilities.**
-
-<sub>From intelligent analysis to executable research workflows.</sub>
+<strong>From paper reading to intelligent research workflows.</strong>
 
 </div>
