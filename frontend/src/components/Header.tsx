@@ -1,20 +1,32 @@
-import { useNavigate } from 'react-router-dom';
-import { Menu, Bell, User, LogOut, FlaskConical, Sun, Moon, Monitor } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
-import { useUIStore } from '@/store/uiStore';
-import type { Theme } from '@/types';
+import { useNavigate } from "react-router-dom";
+import {
+  Menu,
+  Bell,
+  User,
+  LogOut,
+  FlaskConical,
+  Sun,
+  Moon,
+  Monitor,
+} from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { useUIStore } from "@/store/uiStore";
+import type { Theme } from "@/types";
 
 const themeOptions: { value: Theme; label: string; icon: typeof Sun }[] = [
-  { value: 'light', label: '浅色', icon: Sun },
-  { value: 'dark', label: '深色', icon: Moon },
-  { value: 'system', label: '跟随系统', icon: Monitor },
+  { value: "light", label: "浅色", icon: Sun },
+  { value: "dark", label: "深色", icon: Moon },
+  { value: "system", label: "跟随系统", icon: Monitor },
 ];
 
 function ThemeToggle() {
   const { theme, setTheme } = useUIStore();
 
-  const current = themeOptions.find((o) => o.value === theme) || themeOptions[2];
-  const nextIndex = (themeOptions.findIndex((o) => o.value === theme) + 1) % themeOptions.length;
+  const current =
+    themeOptions.find((o) => o.value === theme) || themeOptions[2];
+  const nextIndex =
+    (themeOptions.findIndex((o) => o.value === theme) + 1) %
+    themeOptions.length;
   const next = themeOptions[nextIndex];
 
   const Icon = next.icon;
@@ -37,7 +49,7 @@ function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -58,9 +70,13 @@ function Header() {
       <div className="flex items-center gap-2">
         <ThemeToggle />
 
-        <button className="p-2 rounded-lg hover:bg-sci-bg3 transition-colors text-sci-muted hover:text-sci-ink relative">
+        <button
+          className="p-2 rounded-lg hover:bg-sci-bg3 transition-colors text-sci-muted hover:text-sci-ink"
+          type="button"
+          title="通知"
+          aria-label="通知"
+        >
           <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sci-danger rounded-full" />
         </button>
 
         {user ? (
@@ -79,7 +95,7 @@ function Header() {
           </div>
         ) : (
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
             className="sci-btn-primary text-sm"
           >
             登录

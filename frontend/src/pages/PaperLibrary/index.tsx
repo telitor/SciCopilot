@@ -1,30 +1,29 @@
-import { useState } from 'react';
-import { Search, Upload, Clock, FileText, Trash2 } from 'lucide-react';
-import { usePaperStore } from '@/store/paperStore';
-import { useUIStore } from '@/store/uiStore';
-import { mockAPI } from '@/services/api';
+import { useState } from "react";
+import { Search, Upload, Clock, FileText, Trash2 } from "lucide-react";
+import { usePaperStore } from "@/store/paperStore";
+import { useUIStore } from "@/store/uiStore";
 
 function PaperLibrary() {
   const { papers, setCurrentPaper, deletePaper } = usePaperStore();
   const { addNotification } = useUIStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const mockPapers = mockAPI.getMockPapers();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
-  const displayPapers = papers.length > 0 ? papers : mockPapers;
-
-  const filteredPapers = displayPapers.filter((paper) => {
+  const filteredPapers = papers.filter((paper) => {
     const matchesSearch =
       !searchQuery ||
       paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      paper.authors.some((a) => a.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = filterStatus === 'all' || paper.status === filterStatus;
+      paper.authors.some((a) =>
+        a.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    const matchesStatus =
+      filterStatus === "all" || paper.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
   const handleDelete = (id: string) => {
     deletePaper(id);
-    addNotification({ type: 'success', message: '论文已删除', duration: 3000 });
+    addNotification({ type: "success", message: "论文已删除", duration: 3000 });
   };
 
   return (
@@ -33,7 +32,13 @@ function PaperLibrary() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">论文库</h1>
         <button
-          onClick={() => addNotification({ type: 'info', message: '上传功能在论文精读页面', duration: 3000 })}
+          onClick={() =>
+            addNotification({
+              type: "info",
+              message: "上传功能在论文精读页面",
+              duration: 3000,
+            })
+          }
           className="sci-btn-primary"
         >
           <Upload size={16} />
@@ -44,7 +49,10 @@ function PaperLibrary() {
       {/* Search & Filter */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-sci-muted" />
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-sci-muted"
+          />
           <input
             type="text"
             value={searchQuery}
@@ -80,14 +88,18 @@ function PaperLibrary() {
               <div className="flex items-center gap-2">
                 <span
                   className={`sci-badge-${
-                    paper.status === 'completed'
-                      ? 'success'
-                      : paper.status === 'processing'
-                      ? 'warning'
-                      : 'info'
+                    paper.status === "completed"
+                      ? "success"
+                      : paper.status === "processing"
+                        ? "warning"
+                        : "info"
                   }`}
                 >
-                  {paper.status === 'completed' ? '已完成' : paper.status === 'processing' ? '处理中' : '上传中'}
+                  {paper.status === "completed"
+                    ? "已完成"
+                    : paper.status === "processing"
+                      ? "处理中"
+                      : "上传中"}
                 </span>
                 <button
                   onClick={(e) => {
@@ -104,14 +116,18 @@ function PaperLibrary() {
             <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-sci-accent transition-colors">
               {paper.title}
             </h3>
-            <p className="text-sm text-sci-muted mb-3 line-clamp-1">{paper.authors.join(', ')}</p>
+            <p className="text-sm text-sci-muted mb-3 line-clamp-1">
+              {paper.authors.join(", ")}
+            </p>
 
             <div className="flex items-center justify-between text-xs text-sci-muted">
               <span className="flex items-center gap-1">
                 <Clock size={12} />
-                {new Date(paper.uploaded_at).toLocaleDateString('zh-CN')}
+                {new Date(paper.uploaded_at).toLocaleDateString("zh-CN")}
               </span>
-              {paper.arxiv_id && <span className="sci-badge-info">{paper.arxiv_id}</span>}
+              {paper.arxiv_id && (
+                <span className="sci-badge-info">{paper.arxiv_id}</span>
+              )}
             </div>
           </div>
         ))}
@@ -120,7 +136,11 @@ function PaperLibrary() {
       {filteredPapers.length === 0 && (
         <div className="text-center py-20">
           <FileText size={48} className="text-sci-border mx-auto mb-4" />
-          <p className="text-sci-muted">没有找到匹配的论文</p>
+          <p className="text-sci-muted">
+            {papers.length === 0
+              ? "暂无论文，请先前往论文精读上传"
+              : "没有找到匹配的论文"}
+          </p>
         </div>
       )}
     </div>

@@ -1,65 +1,254 @@
-import { useState } from 'react';
-import { Mail, Calendar, FileText, MessageSquare, Star, Clock } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  AlertCircle,
+  Calendar,
+  Clock,
+  FileText,
+  Loader2,
+  Mail,
+  MessageSquare,
+  RefreshCw,
+  Star,
+} from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { conversationAPI, getErrorMessage } from "@/services/api";
+
+interface ConversationSummary {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+function isConversationSummary(value: unknown): value is ConversationSummary {
+  if (!value || typeof value !== "object") return false;
+
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.id === "string" &&
+    typeof item.title === "string" &&
+    typeof item.created_at === "string" &&
+    typeof item.updated_at === "string"
+  );
+}
+
+function formatDate(value?: string, includeTime = false) {
+  if (!value) return "尚无数据";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "时间未知";
+
+  return date.toLocaleString(
+    "zh-CN",
+    includeTime
+      ? {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      : { year: "numeric", month: "short", day: "numeric" },
+  );
+}
 
 function Profile() {
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "history" | "settings"
+  >("overview");
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  const stats = [
-    { label: '上传论文', value: 12, icon: FileText },
-    { label: '对话次数', value: 86, icon: MessageSquare },
-    { label: '收藏论文', value: 24, icon: Star },
-    { label: '使用天数', value: 45, icon: Clock },
-  ];
+  const loadConversations = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError("");
+
+    try {
+      const response = await conversationAPI.getConversations();
+      const records = Array.isArray(response.data)
+        ? response.data.filter(isConversationSummary)
+        : [];
+
+      records.sort(
+        (left, right) =>
+          Date.parse(right.updated_at) - Date.parse(left.updated_at),
+      );
+      setConversations(records);
+    } catch (error) {
+      setConversations([]);
+      setLoadError(getErrorMessage(error, "会话记录加载超时，请稍后重试。"));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadConversations();
+  }, [loadConversations]);
+
+  const latestConversation = conversations[0];
+  const stats = useMemo(
+    () => [
+      {
+        label: "会话总数",
+        value: isLoading || loadError ? "—" : String(conversations.length),
+        detail: isLoading
+          ? "正在加载"
+          : loadError
+            ? "加载失败"
+            : "来自真实会话记录",
+        icon: MessageSquare,
+      },
+      {
+        label: "最近更新",
+        value:
+          isLoading || loadError
+            ? "—"
+            : formatDate(latestConversation?.updated_at),
+        detail: latestConversation ? "最近一条会话" : "尚无数据",
+        icon: Clock,
+      },
+      {
+        label: "论文统计",
+        value: "—",
+        detail: "尚无数据",
+        icon: FileText,
+      },
+      {
+        label: "收藏统计",
+        value: "—",
+        detail: "尚无数据",
+        icon: Star,
+      },
+    ],
+    [conversations.length, isLoading, latestConversation, loadError],
+  );
+
+  const conversationList = (limit?: number) => {
+    if (isLoading) {
+      return (
+        <div className="min-h-40 flex flex-col items-center justify-center text-sci-muted">
+          <Loader2 size={22} className="animate-spin text-sci-accent mb-3" />
+          <p className="text-sm">正在读取真实会话记录…</p>
+        </div>
+      );
+    }
+
+    if (loadError) {
+      return (
+        <div className="min-h-40 flex flex-col items-center justify-center text-center">
+          <AlertCircle size={22} className="text-sci-warning mb-3" />
+          <p className="font-medium">会话记录加载失败</p>
+          <p className="text-sm text-sci-muted mt-1 max-w-md">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => void loadConversations()}
+            className="sci-btn-secondary mt-4"
+          >
+            重新加载
+          </button>
+        </div>
+      );
+    }
+
+    const visibleConversations =
+      typeof limit === "number" ? conversations.slice(0, limit) : conversations;
+
+    if (visibleConversations.length === 0) {
+      return (
+        <div className="min-h-40 flex flex-col items-center justify-center text-center">
+          <MessageSquare size={22} className="text-sci-muted mb-3" />
+          <p className="font-medium">尚无会话数据</p>
+          <p className="text-sm text-sci-muted mt-1">
+            开始一次真实智能体对话后，记录会显示在这里。
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="divide-y divide-sci-border">
+        {visibleConversations.map((conversation) => (
+          <div
+            key={conversation.id}
+            className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
+          >
+            <div className="w-9 h-9 rounded-xl bg-sci-bg3 flex items-center justify-center flex-shrink-0">
+              <MessageSquare size={15} className="text-sci-accent" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium truncate">
+                {conversation.title.trim() || "未命名会话"}
+              </p>
+              <p className="text-xs text-sci-muted mt-1">
+                更新于 {formatDate(conversation.updated_at, true)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-0">
-      {/* Profile Header */}
       <div className="sci-card-glow">
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-sci-primary to-sci-accent flex items-center justify-center text-white text-2xl font-bold">
-            {user?.username?.[0]?.toUpperCase() || 'U'}
+            {user?.username?.[0]?.toUpperCase() || "U"}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">{user?.username || '用户'}</h1>
-            <div className="flex items-center gap-4 mt-2 text-sm text-sci-muted">
-              <span className="flex items-center gap-1">
-                <Mail size={14} />
-                {user?.email || 'user@example.com'}
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold">{user?.username || "用户"}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 text-sm text-sci-muted">
+              <span className="flex items-center gap-1 min-w-0">
+                <Mail size={14} className="flex-shrink-0" />
+                <span className="truncate">{user?.email || "未提供邮箱"}</span>
               </span>
               <span className="flex items-center gap-1">
                 <Calendar size={14} />
-                注册于 {new Date(user?.created_at || Date.now()).toLocaleDateString('zh-CN')}
+                注册于 {formatDate(user?.created_at)}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-sci-border">
-        {[
-          { key: 'overview', label: '概览' },
-          { key: 'history', label: '历史记录' },
-          { key: 'settings', label: '设置' },
-        ].map((tab) => (
+      <div className="flex items-end justify-between gap-4 border-b border-sci-border">
+        <div className="flex gap-2 overflow-x-auto">
+          {[
+            { key: "overview", label: "概览" },
+            { key: "history", label: "历史记录" },
+            { key: "settings", label: "设置" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key as typeof activeTab)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.key
+                  ? "border-sci-accent text-sci-accent"
+                  : "border-transparent text-sci-muted hover:text-sci-ink"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {!isLoading && (
           <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key as typeof activeTab)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? 'border-sci-accent text-sci-accent'
-                : 'border-transparent text-sci-muted hover:text-sci-ink'
-            }`}
+            type="button"
+            onClick={() => void loadConversations()}
+            className="hidden sm:inline-flex items-center gap-1.5 pb-2.5 text-xs text-sci-muted hover:text-sci-accent transition-colors"
           >
-            {tab.label}
+            <RefreshCw size={13} />
+            刷新会话
           </button>
-        ))}
+        )}
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
+      {activeTab === "overview" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {stats.map((stat) => {
@@ -67,106 +256,82 @@ function Profile() {
               return (
                 <div key={stat.label} className="sci-card text-center">
                   <Icon size={20} className="text-sci-accent mx-auto mb-2" />
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-sm text-sci-muted">{stat.label}</div>
+                  <div className="text-xl font-bold break-words">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-sci-muted mt-1">
+                    {stat.label}
+                  </div>
+                  <div className="text-xs text-sci-muted mt-1">
+                    {stat.detail}
+                  </div>
                 </div>
               );
             })}
           </div>
 
           <div className="sci-card">
-            <h3 className="font-semibold mb-4">最近使用模块</h3>
-            <div className="space-y-3">
-              {[
-                { name: '论文精读', count: 45, percent: 45 },
-                { name: '问题拆解', count: 20, percent: 20 },
-                { name: '实验路线', count: 15, percent: 15 },
-                { name: '代码复现', count: 12, percent: 12 },
-                { name: '结果分析', count: 8, percent: 8 },
-              ].map((item) => (
-                <div key={item.name}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span>{item.name}</span>
-                    <span className="text-sci-muted">{item.count} 次</span>
-                  </div>
-                  <div className="h-2 bg-sci-bg3 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-sci-primary to-sci-accent rounded-full transition-all"
-                      style={{ width: `${item.percent}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h3 className="font-semibold mb-4">最近会话</h3>
+            {conversationList(5)}
           </div>
         </div>
       )}
 
-      {activeTab === 'history' && (
+      {activeTab === "history" && (
         <div className="sci-card">
-          <h3 className="font-semibold mb-4">操作历史</h3>
-          <div className="space-y-3">
-            {[
-              { action: '精读论文', target: 'Attention Is All You Need', time: '2 小时前' },
-              { action: '上传论文', target: 'BERT.pdf', time: '昨天' },
-              { action: '生成实验方案', target: 'GNN Clone Detection', time: '3 天前' },
-              { action: '收藏论文', target: 'GraphCodeBERT', time: '1 周前' },
-              { action: '代码复现', target: 'microsoft/GraphCodeBERT', time: '2 周前' },
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-sci-border last:border-0">
-                <div>
-                  <span className="text-sm font-medium">{item.action}</span>
-                  <span className="text-sci-muted mx-2">-</span>
-                  <span className="text-sm text-sci-muted">{item.target}</span>
-                </div>
-                <span className="text-xs text-sci-muted">{item.time}</span>
-              </div>
-            ))}
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 className="font-semibold">会话历史</h3>
+              <p className="text-xs text-sci-muted mt-1">
+                仅展示后端返回的真实会话摘要。
+              </p>
+            </div>
+            {!isLoading && !loadError && (
+              <span className="sci-badge-info">{conversations.length} 条</span>
+            )}
           </div>
+          {conversationList()}
         </div>
       )}
 
-      {activeTab === 'settings' && (
+      {activeTab === "settings" && (
         <div className="space-y-6">
           <div className="sci-card">
             <h3 className="font-semibold mb-4">个人信息</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-sci-muted mb-2">用户名</label>
-                <input type="text" defaultValue={user?.username} className="sci-input w-full max-w-md" />
+                <label className="block text-sm text-sci-muted mb-2">
+                  用户名
+                </label>
+                <input
+                  type="text"
+                  value={user?.username || ""}
+                  disabled
+                  className="sci-input w-full max-w-md opacity-70 cursor-not-allowed"
+                />
               </div>
               <div>
-                <label className="block text-sm text-sci-muted mb-2">邮箱</label>
-                <input type="email" defaultValue={user?.email} className="sci-input w-full max-w-md" />
+                <label className="block text-sm text-sci-muted mb-2">
+                  邮箱
+                </label>
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="sci-input w-full max-w-md opacity-70 cursor-not-allowed"
+                />
               </div>
-              <button className="sci-btn-primary">保存修改</button>
+              <p className="text-sm text-sci-muted">
+                账户资料编辑接口尚未提供，当前仅支持查看。
+              </p>
             </div>
           </div>
 
           <div className="sci-card">
-            <h3 className="font-semibold mb-4">偏好设置</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">消息通知</p>
-                  <p className="text-sm text-sci-muted">接收实验完成、论文解析等通知</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-sci-bg3 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sci-primary" />
-                </label>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">自动保存</p>
-                  <p className="text-sm text-sci-muted">自动保存对话和实验记录</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-sci-bg3 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sci-primary" />
-                </label>
-              </div>
-            </div>
+            <h3 className="font-semibold mb-2">偏好设置</h3>
+            <p className="text-sm text-sci-muted leading-6">
+              消息通知与自动保存偏好尚未接入后端，当前没有可展示或修改的真实设置。
+            </p>
           </div>
         </div>
       )}

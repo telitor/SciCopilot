@@ -1,50 +1,84 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, FlaskConical, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
-import { useUIStore } from '@/store/uiStore';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  FlaskConical,
+  ArrowLeft,
+  CheckCircle,
+} from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { useUIStore } from "@/store/uiStore";
+import { authAPI, getErrorMessage } from "@/services/api";
 
 function Register() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const { addNotification } = useUIStore();
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const hasLettersAndNumbers = /[A-Za-z]/.test(password) && /\d/.test(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !email || !password) {
-      addNotification({ type: 'warning', message: '请填写完整信息', duration: 3000 });
+      addNotification({
+        type: "warning",
+        message: "请填写完整信息",
+        duration: 3000,
+      });
+      return;
+    }
+    if (password.length < 8 || !hasLettersAndNumbers) {
+      addNotification({
+        type: "warning",
+        message: "密码至少 8 位，并且需要同时包含字母和数字",
+        duration: 3000,
+      });
       return;
     }
     if (password !== confirmPassword) {
-      addNotification({ type: 'warning', message: '两次密码输入不一致', duration: 3000 });
+      addNotification({
+        type: "warning",
+        message: "两次密码输入不一致",
+        duration: 3000,
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await authAPI.register(email, password, username);
+      const response = await authAPI.register(email, password, username);
+      const { user, token } = response.data;
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const mockUser = {
-        id: '1',
-        email,
-        username,
-        role: 'user' as const,
-        created_at: new Date().toISOString(),
-      };
-      login(mockUser, 'mock-jwt-token');
-      addNotification({ type: 'success', message: '注册成功', duration: 3000 });
-      navigate('/dashboard');
-    } catch {
-      addNotification({ type: 'error', message: '注册失败，请重试', duration: 5000 });
+      if (token) {
+        login(user, token);
+        addNotification({
+          type: "success",
+          message: "注册成功",
+          duration: 3000,
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      addNotification({
+        type: "info",
+        message: "注册成功，请先完成邮箱确认后再登录",
+        duration: 5000,
+      });
+      navigate("/login");
+    } catch (error) {
+      addNotification({
+        type: "error",
+        message: `注册失败：${getErrorMessage(error)}`,
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +92,7 @@ function Register() {
 
       <div className="relative w-full max-w-md">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="flex items-center gap-2 text-sci-muted hover:text-sci-ink transition-colors mb-8"
         >
           <ArrowLeft size={18} />
@@ -78,7 +112,9 @@ function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-sci-ink mb-2">用户名</label>
+              <label className="block text-sm font-medium text-sci-ink mb-2">
+                用户名
+              </label>
               <input
                 type="text"
                 value={username}
@@ -89,7 +125,9 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-sci-ink mb-2">邮箱</label>
+              <label className="block text-sm font-medium text-sci-ink mb-2">
+                邮箱
+              </label>
               <input
                 type="email"
                 value={email}
@@ -100,10 +138,12 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-sci-ink mb-2">密码</label>
+              <label className="block text-sm font-medium text-sci-ink mb-2">
+                密码
+              </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="设置密码（至少8位）"
@@ -120,7 +160,9 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-sci-ink mb-2">确认密码</label>
+              <label className="block text-sm font-medium text-sci-ink mb-2">
+                确认密码
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
@@ -132,11 +174,17 @@ function Register() {
 
             <div className="space-y-2 text-xs text-sci-muted">
               <div className="flex items-center gap-2">
-                <CheckCircle size={14} className={password.length >= 8 ? 'text-sci-success' : ''} />
+                <CheckCircle
+                  size={14}
+                  className={password.length >= 8 ? "text-sci-success" : ""}
+                />
                 <span>至少 8 个字符</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle size={14} />
+                <CheckCircle
+                  size={14}
+                  className={hasLettersAndNumbers ? "text-sci-success" : ""}
+                />
                 <span>包含字母和数字</span>
               </div>
             </div>
@@ -149,7 +197,7 @@ function Register() {
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                '注册'
+                "注册"
               )}
             </button>
           </form>

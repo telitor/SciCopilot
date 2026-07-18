@@ -1,14 +1,13 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Share2, Search, ZoomIn, ZoomOut, Maximize2, Info } from 'lucide-react';
-import { mockAPI } from '@/services/api';
-import type { KGNode, KGEdge } from '@/types';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Share2, Search, ZoomIn, ZoomOut, Maximize2, Info } from "lucide-react";
+import type { KGNode, KGEdge } from "@/types";
 
 const categoryColors: Record<string, string> = {
-  concept: '#38bdf8',
-  technique: '#8b5cf6',
-  dataset: '#10b981',
-  paper: '#f59e0b',
-  tool: '#ef4444',
+  concept: "#38bdf8",
+  technique: "#8b5cf6",
+  dataset: "#10b981",
+  paper: "#f59e0b",
+  tool: "#ef4444",
 };
 
 function KnowledgeGraphCanvas() {
@@ -22,32 +21,27 @@ function KnowledgeGraphCanvas() {
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const data = mockAPI.getMockKnowledgeGraph();
-    // Initialize positions
-    const initializedNodes = data.nodes.map((node, i) => ({
-      ...node,
-      x: 400 + Math.cos((i / data.nodes.length) * Math.PI * 2) * 200,
-      y: 300 + Math.sin((i / data.nodes.length) * Math.PI * 2) * 200,
-    }));
-    setNodes(initializedNodes);
-  }, []);
-
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const data = mockAPI.getMockKnowledgeGraph();
-
     // Draw edges
-    data.edges.forEach((edge) => {
+    edges.forEach((edge) => {
       const source = nodes.find((n) => n.id === edge.source);
       const target = nodes.find((n) => n.id === edge.target);
-      if (!source || !target || !source.x || !source.y || !target.x || !target.y) return;
+      if (
+        !source ||
+        !target ||
+        !source.x ||
+        !source.y ||
+        !target.x ||
+        !target.y
+      )
+        return;
 
       ctx.beginPath();
       ctx.moveTo((source.x + offset.x) * scale, (source.y + offset.y) * scale);
@@ -59,9 +53,9 @@ function KnowledgeGraphCanvas() {
       // Draw relation label
       const midX = ((source.x + target.x) / 2 + offset.x) * scale;
       const midY = ((source.y + target.y) / 2 + offset.y) * scale;
-      ctx.fillStyle = '#64748b';
-      ctx.font = '10px Inter';
-      ctx.textAlign = 'center';
+      ctx.fillStyle = "#64748b";
+      ctx.font = "10px Inter";
+      ctx.textAlign = "center";
       ctx.fillText(edge.relation, midX, midY);
     });
 
@@ -75,30 +69,30 @@ function KnowledgeGraphCanvas() {
       // Node circle
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = "#0f172a";
       ctx.fill();
-      ctx.strokeStyle = categoryColors[node.category] || '#38bdf8';
+      ctx.strokeStyle = categoryColors[node.category] || "#38bdf8";
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Glow effect
       ctx.beginPath();
       ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
-      ctx.strokeStyle = `${categoryColors[node.category] || '#38bdf8'}33`;
+      ctx.strokeStyle = `${categoryColors[node.category] || "#38bdf8"}33`;
       ctx.lineWidth = 4;
       ctx.stroke();
 
       // Label
-      ctx.fillStyle = '#f1f5f9';
+      ctx.fillStyle = "#f1f5f9";
       ctx.font = `bold ${12 * scale}px Inter`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       ctx.fillText(node.label, x, y);
 
       // Category indicator
       ctx.beginPath();
       ctx.arc(x + radius * 0.7, y - radius * 0.7, 5 * scale, 0, Math.PI * 2);
-      ctx.fillStyle = categoryColors[node.category] || '#38bdf8';
+      ctx.fillStyle = categoryColors[node.category] || "#38bdf8";
       ctx.fill();
     });
   }, [nodes, edges, scale, offset]);
@@ -124,7 +118,10 @@ function KnowledgeGraphCanvas() {
       setDragging(clickedNode.id);
     } else {
       setIsPanning(true);
-      setPanStart({ x: e.clientX - offset.x * scale, y: e.clientY - offset.y * scale });
+      setPanStart({
+        x: e.clientX - offset.x * scale,
+        y: e.clientY - offset.y * scale,
+      });
     }
   };
 
@@ -145,8 +142,8 @@ function KnowledgeGraphCanvas() {
     if (dragging) {
       setNodes((prev) =>
         prev.map((n) =>
-          n.id === dragging ? { ...n, x: mouseX, y: mouseY } : n
-        )
+          n.id === dragging ? { ...n, x: mouseX, y: mouseY } : n,
+        ),
       );
     } else if (isPanning) {
       setOffset({
@@ -181,6 +178,18 @@ function KnowledgeGraphCanvas() {
         onWheel={handleWheel}
       />
 
+      {nodes.length === 0 && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
+          <div className="max-w-md rounded-xl border border-sci-border bg-sci-bg2/90 p-6 text-center backdrop-blur-sm">
+            <Share2 size={28} className="mx-auto mb-3 text-sci-muted" />
+            <h2 className="font-semibold text-sci-ink">暂无知识图谱数据</h2>
+            <p className="mt-2 text-sm text-sci-muted">
+              知识图谱接口尚未接入，接入后将在此展示真实节点与关系。
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="absolute top-4 right-4 flex flex-col gap-2">
         <button
@@ -196,7 +205,10 @@ function KnowledgeGraphCanvas() {
           <ZoomOut size={16} />
         </button>
         <button
-          onClick={() => { setScale(1); setOffset({ x: 0, y: 0 }); }}
+          onClick={() => {
+            setScale(1);
+            setOffset({ x: 0, y: 0 });
+          }}
           className="p-2 rounded-lg bg-sci-bg2 border border-sci-border hover:bg-sci-bg3 text-sci-muted"
         >
           <Maximize2 size={16} />
@@ -221,7 +233,7 @@ function KnowledgeGraphCanvas() {
 }
 
 function KnowledgeGraph() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
@@ -229,12 +241,16 @@ function KnowledgeGraph() {
         <h1 className="text-2xl font-bold">知识图谱</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-sci-muted" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-sci-muted"
+            />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索概念..."
+              placeholder="知识图谱接口尚未接入"
+              disabled
               className="sci-input pl-10 w-64"
             />
           </div>
@@ -245,9 +261,20 @@ function KnowledgeGraph() {
       <div className="flex items-center gap-4 flex-wrap">
         {Object.entries(categoryColors).map(([category, color]) => (
           <div key={category} className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: color }}
+            />
             <span className="text-sm text-sci-muted capitalize">
-              {category === 'concept' ? '概念' : category === 'technique' ? '技术' : category === 'dataset' ? '数据集' : category === 'paper' ? '论文' : '工具'}
+              {category === "concept"
+                ? "概念"
+                : category === "technique"
+                  ? "技术"
+                  : category === "dataset"
+                    ? "数据集"
+                    : category === "paper"
+                      ? "论文"
+                      : "工具"}
             </span>
           </div>
         ))}
@@ -295,13 +322,11 @@ function KnowledgeGraph() {
         <div className="sci-card">
           <div className="flex items-center gap-2 mb-3">
             <Search size={16} className="text-sci-accent" />
-            <h3 className="font-semibold">热门概念</h3>
+            <h3 className="font-semibold">接口状态</h3>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {['Code Clone', 'AST', 'GNN', 'Transformer', 'BERT'].map((concept) => (
-              <span key={concept} className="sci-badge-info text-[10px]">{concept}</span>
-            ))}
-          </div>
+          <p className="text-sm text-sci-muted">
+            尚未连接知识图谱数据源，当前页面不会生成或展示模拟节点。
+          </p>
         </div>
       </div>
     </div>

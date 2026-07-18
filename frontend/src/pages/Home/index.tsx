@@ -1,220 +1,312 @@
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  FlaskConical,
-  FileText,
-  GitBranch,
-  Route,
-  Code2,
-  BarChart3,
   ArrowRight,
-  Sparkles,
-  Zap,
-  Shield,
-} from 'lucide-react';
+  ChevronDown,
+  GitBranch,
+  GitCommitHorizontal,
+  Layers3,
+  Moon,
+  Play,
+  RotateCcw,
+  ShieldCheck,
+  Sun,
+} from "lucide-react";
+import ResearchLauncher from "@/components/ResearchLauncher";
+import { useUIStore } from "@/store/uiStore";
 
-const features = [
-  {
-    icon: FileText,
-    title: '论文精读',
-    desc: 'AI 辅助深度阅读，自动生成结构化报告与引用溯源',
-    color: 'from-sky-500 to-blue-600',
-    path: '/paper/read',
-  },
-  {
-    icon: GitBranch,
-    title: '问题拆解',
-    desc: '将研究方向拆解为可执行的子问题，评估可行性',
-    color: 'from-emerald-500 to-teal-600',
-    path: '/research/decompose',
-  },
-  {
-    icon: Route,
-    title: '实验路线',
-    desc: '生成完整实验方案，推荐 baseline 与数据集',
-    color: 'from-amber-500 to-orange-600',
-    path: '/experiment/roadmap',
-  },
-  {
-    icon: Code2,
-    title: '代码复现',
-    desc: '分析 GitHub 仓库，提供逐步复现指南与错误诊断',
-    color: 'from-violet-500 to-purple-600',
-    path: '/code/reproduce',
-  },
-  {
-    icon: BarChart3,
-    title: '结果分析',
-    desc: '自动可视化实验数据，生成统计分析与写作建议',
-    color: 'from-rose-500 to-pink-600',
-    path: '/result/analyze',
-  },
-];
-
-const stats = [
-  { label: '论文解析', value: '10,000+', icon: FileText },
-  { label: '实验方案', value: '5,000+', icon: Route },
-  { label: '代码复现', value: '2,000+', icon: Code2 },
-  { label: '活跃用户', value: '3,000+', icon: Sparkles },
+const buildSteps = [
+  "解析研究主题",
+  "初始化仓库结构",
+  "生成提交节点",
+  "运行测试套件",
+  "构建依赖图谱",
+  "验证通过",
 ];
 
 function Home() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useUIStore();
+  const [introVisible, setIntroVisible] = useState(true);
+  const [animationKey, setAnimationKey] = useState(0);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduceMotion) {
+      setIntroVisible(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setIntroVisible(false), 1050);
+    return () => window.clearTimeout(timer);
+  }, [animationKey]);
+
+  const handleNavigate = useCallback(
+    (path: string) => navigate(path),
+    [navigate],
+  );
+
+  const replayIntro = () => {
+    setAnimationKey((value) => value + 1);
+    setIntroVisible(true);
+  };
+
+  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
+
+  const scrollToSection = (id: string) => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  };
 
   return (
-    <div className="min-h-screen bg-sci-bg text-sci-ink">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32 px-6">
-        <div className="absolute inset-0 bg-gradient-tech opacity-30" />
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-sci-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-sci-purple/10 rounded-full blur-3xl" />
-
-        <div className="relative max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sci-bg2 border border-sci-border mb-8">
-            <Sparkles size={16} className="text-sci-accent" />
-            <span className="text-sm text-sci-muted">面向软件工程学生的 AI 科研智能体平台</span>
+    <div className="launch-page" key={animationKey}>
+      {introVisible && (
+        <div className="launch-intro" aria-hidden="true">
+          <div className="launch-intro__brand">
+            <GitBranch size={24} />
+            <span>SciPilot</span>
           </div>
+          <div className="launch-intro__assembly">
+            {[1, 2, 3, 4, 5].map((item) => (
+              <span key={item} />
+            ))}
+          </div>
+          <p>正在装配科研工作流</p>
+        </div>
+      )}
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="sci-glow-text">SciCopilot</span>
+      <header className="launch-header">
+        <div className="launch-header__inner">
+          <button
+            className="launch-brand"
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            <span className="launch-brand__mark">
+              <GitBranch size={21} />
+            </span>
+            <span>
+              <strong>SciPilot</strong>
+              <small>软件工程科研工作台</small>
+            </span>
+          </button>
+
+          <nav aria-label="账户导航">
+            <button
+              className="launch-icon-button"
+              type="button"
+              onClick={toggleTheme}
+              aria-label="切换明暗主题"
+            >
+              {theme === "light" ? <Moon size={19} /> : <Sun size={19} />}
+            </button>
+            <button
+              className="launch-link-button"
+              type="button"
+              onClick={() => navigate("/login")}
+            >
+              登录
+            </button>
+            <button
+              className="launch-register-button"
+              type="button"
+              onClick={() => navigate("/register")}
+            >
+              免费开始
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="launch-main">
+        <section className="launch-copy">
+          <div className="launch-copy__eyebrow">
+            <GitBranch size={15} />
+            面向软件工程研究的 AI 工作台
+          </div>
+          <h1>
+            把研究，
             <br />
-            <span className="text-sci-ink">让科研更高效</span>
+            <span>编译成成果。</span>
           </h1>
-
-          <p className="text-xl text-sci-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-            从论文精读到实验设计，从代码复现到结果分析，SciCopilot 全程陪伴你的科研之旅
+          <p>
+            从论文精读到结果分析，以提交为节点，让每一步研究都清晰、可复现、可追溯。
           </p>
-
-          <div className="flex items-center justify-center gap-4">
+          <div className="launch-copy__actions">
             <button
-              onClick={() => navigate('/register')}
-              className="sci-btn-primary text-base px-8 py-3"
+              type="button"
+              className="launch-primary-button"
+              onClick={() => navigate("/register")}
             >
-              开始使用
+              开始一项研究
               <ArrowRight size={18} />
             </button>
             <button
-              onClick={() => navigate('/login')}
-              className="sci-btn-secondary text-base px-8 py-3"
+              type="button"
+              className="launch-secondary-button"
+              onClick={() => navigate("/login")}
             >
-              登录账户
+              登录
             </button>
           </div>
+          <div className="launch-copy__status">
+            <span>面向本地研究工作流</span>
+            <span>
+              <strong>5</strong> 个研究模块
+            </span>
+          </div>
+          <button
+            className="launch-scroll-cue"
+            type="button"
+            onClick={() => scrollToSection("research-workflow")}
+          >
+            探索五个研究模块
+            <ChevronDown size={17} />
+          </button>
+        </section>
+
+        <section className="launch-atmosphere" aria-hidden="true">
+          <div className="launch-atmosphere__brand">
+            <span>Software research, thoughtfully engineered.</span>
+            <strong>SciPilot</strong>
+          </div>
+
+          <div className="launch-codeflow">
+            <div className="launch-codeflow__bar">
+              <span>
+                <GitBranch size={15} /> research-flow.ts
+              </span>
+              <code>main</code>
+            </div>
+            <pre>
+              <code>{`const research = pipeline()
+  .read(paper)
+  .reason(question)
+  .build(experiment)
+  .reproduce(repository)
+  .verify(result);`}</code>
+            </pre>
+            <div className="launch-codeflow__path">
+              <span>paper</span>
+              <ArrowRight size={13} />
+              <span>experiment</span>
+              <ArrowRight size={13} />
+              <span>evidence</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section
+        className="launch-workflow"
+        id="research-workflow"
+        aria-labelledby="research-workflow-title"
+      >
+        <div className="launch-workflow__heading">
+          <span>Research Workflow</span>
+          <h2 id="research-workflow-title">五个模块，顺着研究自然推进。</h2>
+          <p>
+            从理解问题到验证结果，每一步都在同一个工作区里清晰衔接，并保留原有操作方式。
+          </p>
         </div>
+
+        <ResearchLauncher initialIndex={2} onNavigate={handleNavigate} />
+
+        <button
+          className="launch-workflow__next"
+          type="button"
+          onClick={() => scrollToSection("research-journey")}
+        >
+          查看完整研究链路
+          <ChevronDown size={17} />
+        </button>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-sci-bg2/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">五大核心功能</h2>
-            <p className="text-sci-muted">覆盖科研全流程，从入门到发表</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <button
-                  key={feature.title}
-                  onClick={() => navigate(feature.path)}
-                  className="sci-card-glow text-left group"
-                >
-                  <div
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-                  >
-                    <Icon size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-sci-accent transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-sci-muted">{feature.desc}</p>
-                </button>
-              );
-            })}
-          </div>
+      <section className="launch-journey" id="research-journey">
+        <div className="launch-journey__heading">
+          <span>一条完整链路</span>
+          <h2>
+            从一个问题，到一份
+            <br />
+            经得起复现的结果。
+          </h2>
+          <p>
+            研究过程不再散落在聊天、文件和记忆里。SciPilot
+            把关键节点组织成一条连续的提交轨迹。
+          </p>
         </div>
-      </section>
 
-      {/* Stats Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div key={stat.label} className="sci-card text-center">
-                  <Icon size={24} className="text-sci-accent mx-auto mb-3" />
-                  <div className="text-3xl font-bold sci-glow-text mb-1">{stat.value}</div>
-                  <div className="text-sm text-sci-muted">{stat.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Why SciCopilot */}
-      <section className="py-20 px-6 bg-sci-bg2/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">为什么选择 SciCopilot</h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Zap,
-                title: 'AI 驱动',
-                desc: '基于大语言模型，理解科研语境，提供精准建议',
-              },
-              {
-                icon: Shield,
-                title: '溯源可靠',
-                desc: '所有结论均可追溯至原始文献，确保学术严谨性',
-              },
-              {
-                icon: FlaskConical,
-                title: '垂直领域',
-                desc: '专注软件工程领域，深度理解代码与算法',
-              },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className="text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-sci-bg3 border border-sci-border flex items-center justify-center mx-auto mb-4">
-                    <Icon size={28} className="text-sci-accent" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sci-muted">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="sci-card-glow p-10">
-            <h2 className="text-3xl font-bold mb-4">开始你的科研之旅</h2>
-            <p className="text-sci-muted mb-8">
-              加入数千名科研工作者的行列，让 SciCopilot 成为你的智能研究助手
-            </p>
+        <div className="build-track" aria-label="六步研究链路概览">
+          <div className="build-track__topline">
+            <div>
+              <small>研究链路</small>
+              <strong>六步研究闭环</strong>
+            </div>
+            <span>流程概览</span>
             <button
-              onClick={() => navigate('/register')}
-              className="sci-btn-primary text-base px-8 py-3"
+              type="button"
+              onClick={replayIntro}
+              aria-label="重放入场动画"
             >
-              免费注册
-              <ArrowRight size={18} />
+              {introVisible ? <Play size={19} /> : <RotateCcw size={18} />}
             </button>
           </div>
+
+          <div className="build-track__line" role="list">
+            {buildSteps.map((step, index) => (
+              <div
+                className="build-track__step"
+                role="listitem"
+                key={step}
+                style={{ "--step-delay": `${index * 110}ms` } as CSSProperties}
+              >
+                <span>
+                  <small>{String(index + 1).padStart(2, "0")}</small>
+                </span>
+                <strong>{step}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="launch-principles">
+          <article>
+            <span>
+              <GitCommitHorizontal size={22} />
+            </span>
+            <h3>可追溯</h3>
+            <p>每一次判断都回到对应的证据、文件与提交节点。</p>
+          </article>
+          <article>
+            <span>
+              <Layers3 size={22} />
+            </span>
+            <h3>可复现</h3>
+            <p>环境、依赖和实验步骤被完整保留，不再依赖记忆。</p>
+          </article>
+          <article>
+            <span>
+              <ShieldCheck size={22} />
+            </span>
+            <h3>可验证</h3>
+            <p>测试、指标与结果共同构成清晰可信的研究证据。</p>
+          </article>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-sci-border text-center text-sm text-sci-muted">
-        <p>SciCopilot - AI 科研智能体平台</p>
+      <footer className="launch-footer">
+        <div>
+          <strong>SciPilot</strong>
+          <span>面向软件工程研究全过程</span>
+        </div>
+        <span>© 2026 SciPilot</span>
       </footer>
     </div>
   );
